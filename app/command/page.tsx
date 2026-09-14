@@ -106,6 +106,36 @@ export default function CommandPage() {
   const [isRealtime, setIsRealtime] = useState<boolean>(false);
   const [bannerNotice, setBannerNotice] = useState<string | null>(null);
   const [isRunningAll, setIsRunningAll] = useState<boolean>(false);
+  const [burnerWallet, setBurnerWallet] = useState<string>("0xAb5801a7D941c50D9524F53528bA33c467a84000");
+  const [isEditingWallet, setIsEditingWallet] = useState<boolean>(false);
+  const [walletInput, setWalletInput] = useState<string>("");
+  const [walletSavedToast, setWalletSavedToast] = useState<string | null>(null);
+
+  // Load saved MetaMask Burner Wallet from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dcasper3_burner_wallet");
+      if (saved) {
+        setBurnerWallet(saved);
+        setWalletInput(saved);
+      } else {
+        setWalletInput("0xAb5801a7D941c50D9524F53528bA33c467a84000");
+      }
+    } catch (e) {}
+  }, []);
+
+  const handleSaveWallet = () => {
+    const trimmed = walletInput.trim();
+    if (trimmed.startsWith("0x") && trimmed.length >= 10) {
+      setBurnerWallet(trimmed);
+      try {
+        localStorage.setItem("dcasper3_burner_wallet", trimmed);
+      } catch (e) {}
+      setIsEditingWallet(false);
+      setWalletSavedToast("Alamat MetaMask Burner tersimpan!");
+      setTimeout(() => setWalletSavedToast(null), 3000);
+    }
+  };
 
   // Fetch only projects with lifecycle_stage = 'active'
   const fetchActiveData = useCallback(async () => {
@@ -205,13 +235,17 @@ export default function CommandPage() {
   const handleExecute = async (projectId: string, commandPayload: string) => {
     setExecutingId(projectId);
 
+    const finalPayload = commandPayload.includes("--wallet=")
+      ? commandPayload
+      : `${commandPayload} --wallet=${burnerWallet}`;
+
     // Optimistic UI update
     setProjects((prev) =>
       prev.map((p) =>
         p.id === projectId
           ? {
               ...p,
-              command_payload: commandPayload,
+              command_payload: finalPayload,
               status: "pending_execution",
               updated_at: new Date().toISOString(),
             }
@@ -223,7 +257,7 @@ export default function CommandPage() {
     const newLogItem: FarmingLog = {
       id: "opt-" + Date.now(),
       project_id: projectId,
-      log_message: `Command queued: "${commandPayload || "--task=default"}" -> Dolphin Profile 862684906`,
+      log_message: `Command queued: "${finalPayload}" -> Dolphin Profile 862684906 (Burner: ${burnerWallet.slice(0, 6)}...${burnerWallet.slice(-4)})`,
       status: "info",
       timestamp: now,
     };
@@ -234,7 +268,7 @@ export default function CommandPage() {
       await supabase
         .from("projects")
         .update({
-          command_payload: commandPayload,
+          command_payload: finalPayload,
           status: "pending_execution",
           updated_at: now,
         })
@@ -243,7 +277,7 @@ export default function CommandPage() {
       // 2. Record to 'farming_logs' table
       await supabase.from("farming_logs").insert({
         project_id: projectId,
-        log_message: `Manual dispatch via Command Center: "${commandPayload}"`,
+        log_message: `Manual dispatch via Command Center: "${finalPayload}"`,
         status: "info",
         timestamp: now,
       });
@@ -261,37 +295,42 @@ export default function CommandPage() {
 
     const now = new Date().toISOString();
 
-    // Optimistic UI update: Mark all active projects as pending_execution
+    // Optimistic UI update: Mark all active projects as pending_execution with burner wallet
     setProjects((prev) =>
-      prev.map((p) => ({
-        ...p,
-        status: "pending_execution",
-        command_payload: p.command_payload || "--task=default --profile=862684906",
-        updated_at: now,
-      }))
+      prev.map((p) => {
+        const base = p.command_payload || "--task=claim_daily --profile=862684906";
+        const finalP = base.includes("--wallet=") ? base : `${base} --wallet=${burnerWallet}`;
+        return {
+          ...p,
+          status: "pending_execution",
+          command_payload: finalP,
+          updated_at: now,
+        };
+      })
     );
 
     const newLogItem: FarmingLog = {
       id: "opt-run-all-" + Date.now(),
       project_id: projects[0]?.id || "batch-all",
-      log_message: `⚡ RUN ALL EXECUTED: Menjalankan antrean ${projects.length} project secara otomatis via Dolphin Anty Profile 862684906.`,
+      log_message: `⚡ RUN ALL EXECUTED: Menjalankan ${projects.length} antrean proyek ke Dolphin Anty. Target Burner: ${burnerWallet.slice(0, 6)}...${burnerWallet.slice(-4)}`,
       status: "info",
       timestamp: now,
     };
     setLogs((prev) => [newLogItem, ...prev]);
 
     try {
-      // 1. Batch update all active projects to pending_execution in Supabase
-      const { error: batchErr } = await supabase
-        .from("projects")
-        .update({
-          status: "pending_execution",
-          updated_at: now,
-        })
-        .eq("lifecycle_stage", "active");
-
-      if (batchErr) {
-        console.error("Batch update error:", batchErr);
+      // Update each active project with final payload containing burner wallet
+      for (const p of projects) {
+        const base = p.command_payload || "--task=claim_daily --profile=862684906";
+        const finalP = base.includes("--wallet=") ? base : `${base} --wallet=${burnerWallet}`;
+        await supabase
+          .from("projects")
+          .update({
+            command_payload: finalP,
+            status: "pending_execution",
+            updated_at: now,
+          })
+          .eq("id", p.id);
       }
 
       // 2. Insert execution log
@@ -368,6 +407,104 @@ export default function CommandPage() {
           </button>
         </div>
       </div>
+
+      {/* MetaMask Burner Vault Target & Silent Mode Bar */}
+      <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-emerald-950/30 border border-amber-500/30 p-4 rounded-2xl shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4 backdrop-blur-sm">
+        <div className="flex items-start md:items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+            🦊
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-xs sm:text-sm font-bold font-mono text-white tracking-wide uppercase">
+                MetaMask Burner Vault Target
+              </h2>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                MODE HENING (HEADLESS AKTIF - 0 POPUP)
+              </span>
+            </div>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Seluruh koin faucet testnet & reward airdrop yang diklaim bot otomatis diarahkan ke wallet ini tanpa membuka jendela visual di layar Anda.
+            </p>
+
+            {/* Address Display / Input */}
+            <div className="mt-2 flex items-center gap-2 flex-wrap">
+              {isEditingWallet ? (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <input
+                    type="text"
+                    value={walletInput}
+                    onChange={(e) => setWalletInput(e.target.value)}
+                    placeholder="0x..."
+                    className="bg-slate-950 border border-amber-500/50 rounded-lg px-3 py-1 text-xs text-amber-200 font-mono focus:outline-none focus:border-amber-400 w-72"
+                  />
+                  <button
+                    onClick={handleSaveWallet}
+                    className="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition"
+                  >
+                    Simpan
+                  </button>
+                  <button
+                    onClick={() => setIsEditingWallet(false)}
+                    className="px-2 py-1 text-xs text-slate-400 hover:text-white"
+                  >
+                    Batal
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-amber-300 font-semibold tracking-wider select-all">
+                    {burnerWallet}
+                  </span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(burnerWallet);
+                      setWalletSavedToast("Alamat dicopy ke clipboard!");
+                      setTimeout(() => setWalletSavedToast(null), 2500);
+                    }}
+                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono transition"
+                    title="Copy Address"
+                  >
+                    📋 Copy
+                  </button>
+                  <button
+                    onClick={() => {
+                      setWalletInput(burnerWallet);
+                      setIsEditingWallet(true);
+                    }}
+                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-mono transition"
+                  >
+                    ✏️ Ganti Alamat
+                  </button>
+                </div>
+              )}
+              {walletSavedToast && (
+                <span className="text-[10px] text-emerald-400 font-mono animate-fadeIn">
+                  ✓ {walletSavedToast}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Network Indicators */}
+        <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+          <span className="text-[10px] px-2 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-400 font-mono">
+            BERA (80084)
+          </span>
+          <span className="text-[10px] px-2 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-400 font-mono">
+            STORY (1516)
+          </span>
+          <span className="text-[10px] px-2 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-400 font-mono">
+            MONAD
+          </span>
+          <span className="text-[10px] px-2 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-400 font-mono">
+            MOVE
+          </span>
+        </div>
+      </div>
+
 
       {/* Migration Notice (if needed) */}
       {bannerNotice && (
