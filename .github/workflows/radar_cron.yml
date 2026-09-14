@@ -1,0 +1,19 @@
+name: Radar Scanner Cloud Cron
+
+on:
+  schedule:
+    # Runs every 20 minutes automatically 24/7 in the cloud
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+jobs:
+  radar-scan:
+    name: Autonomous Radar Scan & Discord Broadcast
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Cloud Scan Endpoint
+        run: |
+          echo "Triggering https://dcasper3.vercel.app/api/radar/scan..."
+          RESPONSE=$(curl -s -X POST "https://dcasper3.vercel.app/api/radar/scan")
+          echo "Response: $RESPONSE"
+

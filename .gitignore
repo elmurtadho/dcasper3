@@ -1,0 +1,25 @@
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Environment Variables (Keep local secrets safe)
+.env*.local
+.env
+
+# Vercel
+.vercel
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# System
+.DS_Store
+Thumbs.db
+.env*
