@@ -309,6 +309,26 @@ def insert_scouted_project(project_data: Dict[str, Any]) -> Optional[Dict[str, A
 
 
 # ==============================================================================
+# TIMEZONE & TIME FORMATTING (WIB / UTC+7)
+# ==============================================================================
+WIB = datetime.timezone(datetime.timedelta(hours=7))
+
+def get_current_wib_time() -> str:
+    """Get current time formatted in WIB."""
+    return datetime.datetime.now(WIB).strftime("%H:%M WIB")
+
+def format_wib_time(iso_str: Optional[str]) -> str:
+    """Convert ISO timestamp to WIB string 'HH:mm WIB'."""
+    if not iso_str:
+        return get_current_wib_time()
+    try:
+        dt = datetime.datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+        dt_wib = dt.astimezone(WIB)
+        return dt_wib.strftime("%H:%M WIB")
+    except Exception:
+        return get_current_wib_time()
+
+# ==============================================================================
 # RADAR SCAN LOGIC
 # ==============================================================================
 def scan_airdrop_opportunities() -> None:
@@ -317,7 +337,7 @@ def scan_airdrop_opportunities() -> None:
     2. Identifies projects that have NOT yet entered execution (lifecycle_stage = 'active').
     3. If new projects detected:
        - Inserts them into Intel Radar (lifecycle_stage = 'scouted').
-       - Posts Discord embed with list of new airdrops.
+       - Posts Discord embed with list of new airdrops and exact discovery time.
     4. If NO new projects detected:
        - Sends EXACT message: "0 new project detected".
     """
@@ -333,7 +353,8 @@ def scan_airdrop_opportunities() -> None:
             # New opportunity not yet registered anywhere
             inserted = insert_scouted_project(opp)
             if inserted:
-                newly_discovered.append(opp)
+                inserted["discovered_time_wib"] = get_current_wib_time()
+                newly_discovered.append(inserted)
 
     # Evaluate logic rule
     if len(newly_discovered) > 0:
@@ -343,7 +364,9 @@ def scan_airdrop_opportunities() -> None:
         embed_fields = []
         for p in newly_discovered[:5]:
             intel = p.get("intel_data", {})
+            disc_time = p.get("discovered_time_wib") or format_wib_time(p.get("created_at"))
             val = (
+                f"⏰ **Waktu Ditemukan:** `{disc_time}`\n"
                 f"**Tier:** `{intel.get('tier', 'Alpha')}`\n"
                 f"**Budget:** `{intel.get('budget_requirement', 'Free')}`\n"
                 f"**Est. Return:** `{intel.get('estimated_return', 'N/A')}`\n"
@@ -366,7 +389,7 @@ def scan_airdrop_opportunities() -> None:
             "color": 0x06B6D4,  # Cyan
             "fields": embed_fields,
             "footer": {
-                "text": "dcasper3 Radar Engine • Dolphin Anty Profile 862684906"
+                "text": f"dcasper3 Radar Engine • Pukul {get_current_wib_time()}"
             },
             "timestamp": datetime.datetime.utcnow().isoformat(),
         }
@@ -378,6 +401,104 @@ def scan_airdrop_opportunities() -> None:
         # EXACT required rule: "0 new project detected"
         Log.info("Radar scan completed: 0 new project detected.")
         send_discord_chat(content="0 new project detected")
+
+
+# ==============================================================================
+# HOURLY RECAP LOGIC (MENIT 00)
+# ==============================================================================
+def execute_hourly_recap() -> None:
+    """
+    Eksekusi rekapan per jam tepat pada menit 00.
+    Merangkum project yang ditemukan dalam 1 jam terakhir beserta jam ditemukannya.
+    Jika tidak ada: tetap mengirim '0 new project detected' dan rekapan status radar bersih.
+    """
+    now_wib = datetime.datetime.now(WIB)
+    hour_label = now_wib.strftime("%H:00 WIB")
+    Log.info(f"📊 Menjalankan Rekapan Per Jam untuk pukul {hour_label}...")
+
+    # First, run opportunity scan in case any new item appeared
+    existing_before = get_existing_projects()
+    existing_names = {p["name"].strip().lower() for p in existing_before}
+
+    for opp in CURATED_RADAR_OPPORTUNITIES:
+        norm_name = opp["name"].strip().lower()
+        if norm_name not in existing_names:
+            insert_scouted_project(opp)
+
+    # Re-fetch all projects to inspect timestamps in the last 65 minutes
+    projects = get_existing_projects()
+    one_hour_ago = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(minutes=65)
+
+    recent_scouted = []
+    for p in projects:
+        if p.get("lifecycle_stage") == "scouted" and p.get("created_at"):
+            try:
+                dt = datetime.datetime.fromisoformat(p["created_at"].replace("Z", "+00:00"))
+                if dt >= one_hour_ago:
+                    recent_scouted.append(p)
+            except Exception:
+                pass
+
+    active_projects = [p for p in projects if p.get("lifecycle_stage") == "active"]
+
+    if len(recent_scouted) > 0:
+        Log.success(f"Rekapan per jam: Ditemukan {len(recent_scouted)} project dalam 1 jam terakhir.")
+        fields = []
+        for p in recent_scouted[:6]:
+            intel = p.get("intel_data") or {}
+            disc_time = format_wib_time(p.get("created_at"))
+            fields.append({
+                "name": f"💎 {p['name']}",
+                "value": (
+                    f"⏰ **Ditemukan pada pukul:** `{disc_time}`\n"
+                    f"**Tipe:** `{p.get('type', 'EVM / Web3')}` | **Tier:** `{intel.get('tier', 'Alpha')}`\n"
+                    f"**Reward:** `{intel.get('reward_token', 'Token')} ({intel.get('estimated_return', 'N/A')})`\n"
+                    f"**Syarat:** `{intel.get('budget_requirement', 'Free')}`"
+                ),
+                "inline": False,
+            })
+
+        embed = {
+            "title": f"📊 [REKAPAN PER JAM] - Radar Alpha Pukul {hour_label}",
+            "description": (
+                f"Berikut adalah rekapan garapan airdrop baru yang berhasil dideteksi radar dalam 1 jam terakhir:\n"
+                f"🔗 [Buka Intel Radar Dashboard]({DASHBOARD_BASE_URL})"
+            ),
+            "color": 0x3B82F6,  # Blue
+            "fields": fields,
+            "footer": {
+                "text": f"dcasper3 Hourly Recap • {hour_label}"
+            },
+            "timestamp": datetime.datetime.utcnow().isoformat(),
+        }
+
+        send_discord_chat(
+            content=f"📊 **REKAPAN PER JAM ({hour_label}):** Terdeteksi **{len(recent_scouted)} garapan baru** dalam 1 jam terakhir!",
+            embeds=[embed]
+        )
+    else:
+        # EXACT required concept: "0 new project detected"
+        Log.info(f"Rekapan per jam: 0 new project detected dalam 1 jam terakhir ({hour_label}).")
+        
+        embed = {
+            "title": f"📊 [REKAPAN PER JAM] - Radar Alpha Pukul {hour_label}",
+            "description": (
+                f"**0 new project detected** dalam 1 jam terakhir.\n"
+                f"Semua sinyal radar bersih dan seluruh peluang airdrop telah dievaluasi.\n\n"
+                f"⚡ **Status Command Center:** Terdapat `{len(active_projects)} project` dalam antrean eksekusi.\n"
+                f"🔗 [Buka Dasbor dcasper3]({DASHBOARD_BASE_URL})"
+            ),
+            "color": 0x10B981,  # Emerald
+            "footer": {
+                "text": f"dcasper3 Hourly Recap • {hour_label}"
+            },
+            "timestamp": datetime.datetime.utcnow().isoformat(),
+        }
+
+        send_discord_chat(
+            content="0 new project detected",
+            embeds=[embed]
+        )
 
 
 # ==============================================================================
@@ -452,10 +573,11 @@ def main():
     parser = argparse.ArgumentParser(description="dcasper3 Discord Intel and Reminder Agent")
     parser.add_argument("--scan", action="store_true", help="Run one Radar scan iteration")
     parser.add_argument("--remind", action="store_true", help="Run one execution reminder check")
+    parser.add_argument("--hourly", action="store_true", help="Run Hourly Recap (Rekapan Per Jam)")
     parser.add_argument("--test-discord", action="store_true", help="Send test handshake to Discord")
     parser.add_argument("--webhook", type=str, help="Specify Discord Webhook URL directly")
-    parser.add_argument("--loop", action="store_true", help="Run continuous background scanning loop")
-    parser.add_argument("--interval", type=int, default=300, help="Scan interval in seconds (default: 300s / 5m)")
+    parser.add_argument("--loop", action="store_true", help="Run continuous background scanning loop aligned with 00, 20, 40")
+    parser.add_argument("--interval", type=int, default=1200, help="Scan interval in seconds (default: 1200s / 20m)")
 
     args = parser.parse_args()
 
@@ -471,6 +593,11 @@ def main():
         send_discord_chat("🚀 **dcasper3 Discord Agent Connected!** Bot berhasil terhubung ke server Discord Anda.")
         return
 
+    if args.hourly:
+        execute_hourly_recap()
+        check_execution_reminders()
+        return
+
     if args.scan:
         scan_airdrop_opportunities()
         return
@@ -480,23 +607,37 @@ def main():
         return
 
     if args.loop:
-        Log.info(f"Starting continuous automation loop (Interval: {args.interval}s)...")
-        iteration = 1
+        Log.info("Starting continuous loop synchronized with wall-clock minutes 00, 20, 40...")
         while True:
-            Log.info(f"--- [Loop Iteration #{iteration}] ---")
-            try:
+            now_m = datetime.datetime.now(WIB).minute
+            if now_m in (58, 59, 0, 1, 2):
+                execute_hourly_recap()
+            else:
                 scan_airdrop_opportunities()
-                check_execution_reminders()
-            except Exception as e:
-                Log.error(f"Error in loop execution: {e}")
-            Log.info(f"Sleeping for {args.interval}s until next scan cycle...")
-            time.sleep(args.interval)
-            iteration += 1
+            check_execution_reminders()
 
-    scan_airdrop_opportunities()
+            # Sleep until next 20-minute slot (:00, :20, :40)
+            now_dt = datetime.datetime.now(WIB)
+            rem_sec = (20 - (now_dt.minute % 20)) * 60 - now_dt.second
+            if rem_sec <= 0:
+                rem_sec = 1200
+            Log.info(f"Sleeping {rem_sec}s until next aligned tick (:00, :20, :40)...")
+            time.sleep(rem_sec)
+
+    # Default action if called by Windows Task Scheduler:
+    # Auto-detect minute: If at minute 00 (58..02), run Hourly Recap; otherwise run 20-min scan
+    now_min = datetime.datetime.now(WIB).minute
+    if now_min in (58, 59, 0, 1, 2):
+        Log.info(f"Deteksi menit ke-{now_min} (ekor 00): Menjalankan Rekapan Per Jam!")
+        execute_hourly_recap()
+    else:
+        Log.info(f"Deteksi menit ke-{now_min} (ekor 20/40): Menjalankan scan radar rutin 20 menit...")
+        scan_airdrop_opportunities()
+
     check_execution_reminders()
 
 
 if __name__ == "__main__":
     main()
+
 

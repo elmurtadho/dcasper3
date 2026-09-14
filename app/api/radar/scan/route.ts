@@ -222,8 +222,20 @@ async function insertScoutedProject(projectData: any) {
   }
 }
 
+function formatWibTime(isoStr?: string): string {
+  const date = isoStr ? new Date(isoStr) : new Date();
+  return (
+    new Intl.DateTimeFormat("id-ID", {
+      timeZone: "Asia/Jakarta",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(date) + " WIB"
+  );
+}
+
 // Core scan & notification routine
-async function executeAutonomousRadarScan() {
+async function executeAutonomousRadarScan(forceHourly = false) {
   const existing = await getExistingProjects();
   const existingNames = new Set(existing.map((p) => p.name.trim().toLowerCase()));
 
@@ -239,39 +251,109 @@ async function executeAutonomousRadarScan() {
     }
   }
 
-  // 1. Radar scan result notification rule
-  if (newlyDiscovered.length > 0) {
-    const fields = newlyDiscovered.slice(0, 5).map((p) => {
-      const intel = p.intel_data || {};
-      return {
-        name: `💎 ${p.name} (${p.type})`,
-        value: `**Tier:** \`${intel.tier || "Alpha"}\`\n**Budget:** \`${intel.budget_requirement || "Free"}\`\n**Est. Return:** \`${intel.estimated_return || "N/A"}\`\n**URL:** [Buka Dashboard](${intel.dashboard_url || DASHBOARD_BASE_URL})\n**Payload:** \`${p.command_payload || "--task=default"}\``,
-        inline: false,
-      };
+  // Current WIB minute to check if this is an Hourly Recap (:00)
+  const now = new Date();
+  const wibHourStr = new Intl.DateTimeFormat("id-ID", {
+    timeZone: "Asia/Jakarta",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(now);
+  const currentMinute = parseInt(wibHourStr.split(":")[1] || "0", 10);
+  const isHourlyRecap = forceHourly || [58, 59, 0, 1, 2].includes(currentMinute);
+
+  const activeProjects = existing.filter((p) => p.lifecycle_stage === "active");
+
+  if (isHourlyRecap) {
+    // Hourly Recap mode: inspect projects added in the last 65 minutes
+    const sixtyFiveMinsAgo = new Date(Date.now() - 65 * 60 * 1000);
+    const recentProjects = existing.filter((p) => {
+      if (p.lifecycle_stage !== "scouted" || !p.created_at) return false;
+      return new Date(p.created_at) >= sixtyFiveMinsAgo;
     });
 
-    const embed = {
-      title: `📡 [INTEL RADAR] Terdeteksi ${newlyDiscovered.length} Garapan Airdrop Baru!`,
-      description: `Daftar garapan airdrop baru berikut telah otomatis dimasukkan ke **Intel Radar** dan siap dievaluasi untuk masuk ke antrean eksekusi:\n🔗 [Buka Intel Radar Dashboard](${DASHBOARD_BASE_URL})`,
-      color: 0x06b6d4, // Cyan
-      fields,
-      footer: {
-        text: `dcasper3 Autonomous Cloud Radar • Profile ${DOLPHIN_PROFILE_ID}`,
-      },
-      timestamp: new Date().toISOString(),
-    };
+    const currentHourLabel = wibHourStr.split(":")[0] + ":00 WIB";
 
-    await sendDiscordWebhook(
-      `🚨 **RADAR INTEL ALERT:** Terdeteksi **${newlyDiscovered.length}** project garapan airdrop baru yang belum masuk list eksekusi!`,
-      [embed]
-    );
+    if (recentProjects.length > 0 || newlyDiscovered.length > 0) {
+      const combined = [...recentProjects, ...newlyDiscovered];
+      const uniqueMap = new Map();
+      combined.forEach((item) => uniqueMap.set(item.name, item));
+      const uniqueRecent = Array.from(uniqueMap.values());
+
+      const fields = uniqueRecent.slice(0, 6).map((p) => {
+        const intel = p.intel_data || {};
+        const discTime = formatWibTime(p.created_at);
+        return {
+          name: `💎 ${p.name}`,
+          value: `⏰ **Ditemukan pada pukul:** \`${discTime}\`\n**Tipe:** \`${p.type || "EVM / Web3"}\` | **Tier:** \`${intel.tier || "Alpha"}\`\n**Reward:** \`${intel.reward_token || "Token"} (${intel.estimated_return || "N/A"})\`\n**Syarat:** \`${intel.budget_requirement || "Free"}\``,
+          inline: false,
+        };
+      });
+
+      const recapEmbed = {
+        title: `📊 [REKAPAN PER JAM] - Radar Alpha Pukul ${currentHourLabel}`,
+        description: `Berikut adalah rekapan garapan airdrop baru yang berhasil dideteksi radar dalam 1 jam terakhir:\n🔗 [Buka Intel Radar Dashboard](${DASHBOARD_BASE_URL})`,
+        color: 0x3b82f6, // Blue
+        fields,
+        footer: {
+          text: `dcasper3 Hourly Recap • ${currentHourLabel}`,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      await sendDiscordWebhook(
+        `📊 **REKAPAN PER JAM (${currentHourLabel}):** Terdeteksi **${uniqueRecent.length} garapan baru** dalam 1 jam terakhir!`,
+        [recapEmbed]
+      );
+    } else {
+      // EXACT rule: "0 new project detected"
+      const recapEmbed = {
+        title: `📊 [REKAPAN PER JAM] - Radar Alpha Pukul ${currentHourLabel}`,
+        description: `**0 new project detected** dalam 1 jam terakhir.\nSemua sinyal radar bersih dan seluruh peluang airdrop telah dievaluasi.\n\n⚡ **Status Command Center:** Terdapat \`${activeProjects.length} project\` dalam antrean eksekusi.\n🔗 [Buka Dasbor dcasper3](${DASHBOARD_BASE_URL})`,
+        color: 0x10b981, // Emerald
+        footer: {
+          text: `dcasper3 Hourly Recap • ${currentHourLabel}`,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      await sendDiscordWebhook("0 new project detected", [recapEmbed]);
+    }
   } else {
-    // EXACT user required rule: "0 new project detected"
-    await sendDiscordWebhook("0 new project detected");
+    // Regular 20-minute scan (:20, :40)
+    if (newlyDiscovered.length > 0) {
+      const fields = newlyDiscovered.slice(0, 5).map((p) => {
+        const intel = p.intel_data || {};
+        const discTime = formatWibTime(p.created_at);
+        return {
+          name: `💎 ${p.name} (${p.type})`,
+          value: `⏰ **Waktu Ditemukan:** \`${discTime}\`\n**Tier:** \`${intel.tier || "Alpha"}\`\n**Budget:** \`${intel.budget_requirement || "Free"}\`\n**Est. Return:** \`${intel.estimated_return || "N/A"}\`\n**URL:** [Buka Dashboard](${intel.dashboard_url || DASHBOARD_BASE_URL})\n**Payload:** \`${p.command_payload || "--task=default"}\``,
+          inline: false,
+        };
+      });
+
+      const embed = {
+        title: `📡 [INTEL RADAR] Terdeteksi ${newlyDiscovered.length} Garapan Airdrop Baru!`,
+        description: `Daftar garapan airdrop baru berikut telah otomatis dimasukkan ke **Intel Radar** dan siap dievaluasi untuk masuk ke antrean eksekusi:\n🔗 [Buka Intel Radar Dashboard](${DASHBOARD_BASE_URL})`,
+        color: 0x06b6d4, // Cyan
+        fields,
+        footer: {
+          text: `dcasper3 Radar Engine • Pukul ${formatWibTime()}`,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      await sendDiscordWebhook(
+        `🚨 **RADAR INTEL ALERT:** Terdeteksi **${newlyDiscovered.length}** project garapan airdrop baru yang belum masuk list eksekusi!`,
+        [embed]
+      );
+    } else {
+      // EXACT user required rule: "0 new project detected"
+      await sendDiscordWebhook("0 new project detected");
+    }
   }
 
-  // 2. Execution Reminder notification routine
-  const activeProjects = existing.filter((p) => p.lifecycle_stage === "active");
+  // Execution Reminder notification routine
   const dueProjects = activeProjects.filter((p) => {
     const st = p.status || "idle";
     const tasks = p.intel_data?.tasks || [];
@@ -305,24 +387,29 @@ async function executeAutonomousRadarScan() {
 
   return {
     success: true,
+    isHourlyRecap,
     newDiscoveredCount: newlyDiscovered.length,
     dueProjectsCount: dueProjects.length,
     timestamp: new Date().toISOString(),
   };
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const result = await executeAutonomousRadarScan();
+    const { searchParams } = new URL(req.url);
+    const forceHourly = searchParams.get("hourly") === "true";
+    const result = await executeAutonomousRadarScan(forceHourly);
     return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
 }
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
-    const result = await executeAutonomousRadarScan();
+    const { searchParams } = new URL(req.url);
+    const forceHourly = searchParams.get("hourly") === "true";
+    const result = await executeAutonomousRadarScan(forceHourly);
     return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

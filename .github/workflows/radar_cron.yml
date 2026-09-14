@@ -2,8 +2,8 @@ name: Radar Scanner Cloud Cron
 
 on:
   schedule:
-    # Runs every 20 minutes automatically 24/7 in the cloud
-    - cron: '*/20 * * * *'
+    # Runs exactly at minutes :00, :20, :40 every hour 24/7 in cloud
+    - cron: '0,20,40 * * * *'
   workflow_dispatch:
 
 jobs:
