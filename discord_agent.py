@@ -25,6 +25,7 @@ import datetime
 import argparse
 from typing import Optional, Dict, Any, List
 import requests
+from pathlib import Path
 
 # Reconfigure stdout/stderr for Unicode support on Windows terminals
 if hasattr(sys.stdout, "reconfigure"):
@@ -567,82 +568,156 @@ def check_execution_reminders() -> None:
 
 
 # ==============================================================================
-# URGENT ASSET & FAUCET CLAIM / SWAP REMINDER LOGIC
 # ==============================================================================
-def check_urgent_asset_claims() -> int:
-    """
-    Pemeriksaan Khusus: Mendeteksi koin, faucet, dan aset staking yang sudah waktunya
-    untuk di-klaim, di-withdraw, atau di-swap. Mengirimkan Urgent Chat ke Discord.
-    """
-    Log.info("🚨 Memeriksa koin, faucet, dan aset yang siap diklaim / di-swap...")
-    projects = get_existing_projects()
-    keywords = ["faucet", "claim", "swap", "withdraw", "mint", "redeem", "harvest"]
+# URGENT ASSET & FAUCET CLAIM / SWAP REMINDER LOGIC (BY INFO DATA & COOLDOWN)
+# ==============================================================================
+CLAIM_CACHE_FILE = Path(__file__).parent / "claim_cooldown_cache.json"
 
-    urgent_items = []
-    seen_projects = set()
+def parse_interval_hours(interval_str: str) -> float:
+    """Parse interval string like '12h', '24h', 'daily', '1h' to hours."""
+    s = str(interval_str).strip().lower()
+    if not s or s in ("siap klaim", "ready", "none"):
+        return 24.0
+    if "daily" in s or "24h" in s or "24 jam" in s:
+        return 24.0
+    if "12h" in s or "12 jam" in s:
+        return 12.0
+    if "6h" in s:
+        return 6.0
+    if "1h" in s:
+        return 1.0
+    if "weekly" in s or "7d" in s:
+        return 168.0
+    # Try regex/number extraction
+    match = re.search(r"(\d+)\s*h", s)
+    if match:
+        return float(match.group(1))
+    return 24.0
+
+def load_claim_cache() -> dict:
+    if CLAIM_CACHE_FILE.exists():
+        try:
+            with open(CLAIM_CACHE_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
+
+def save_claim_cache(cache: dict) -> None:
+    try:
+        with open(CLAIM_CACHE_FILE, "w", encoding="utf-8") as f:
+            json.dump(cache, f, indent=2)
+    except Exception as e:
+        Log.warn(f"Failed to save claim cache: {e}")
+
+def check_urgent_asset_claims(force: bool = False) -> int:
+    """
+    Pemeriksaan Otomatis Berdasarkan Data Info:
+    Mendeteksi koin, faucet, NFT, dan reward yang SUDAH WAKTUNYA diklaim atau di-swap
+    berdasarkan interval cooldown masing-masing (12h, 24h/daily, dll).
+    Mengirimkan alert ke Discord dan mengupdate histori agar tidak spam.
+    """
+    Log.info("🚨 Memeriksa siklus cooldown koin, faucet, dan aset yang siap diklaim / di-swap...")
+    projects = get_existing_projects()
+    keywords = ["faucet", "claim", "swap", "withdraw", "mint", "redeem", "harvest", "feed", "reward"]
+
+    cache = load_claim_cache()
+    now_utc = datetime.datetime.now(datetime.timezone.utc)
+    due_items = []
 
     for p in projects:
         intel = p.get("intel_data") or {}
         tasks = intel.get("tasks") or []
         for t in tasks:
-            t_name = str(t.get("name", "")).lower()
-            t_type = str(t.get("type", "")).lower()
-            t_status = str(t.get("status", "")).lower()
+            t_name = str(t.get("name", "")).strip()
+            t_type = str(t.get("type", "")).strip().lower()
+            t_status = str(t.get("status", "")).strip().lower()
+            t_interval = str(t.get("interval", "24h")).strip()
 
-            if t_status in ("ready", "operational"):
-                if any(k in t_name or k in t_type for k in keywords):
-                    item_key = f"{p['name']}-{t.get('name')}"
-                    if item_key not in seen_projects:
-                        seen_projects.add(item_key)
-                        urgent_items.append({
+            if t_status in ("ready", "operational") or any(k in t_name.lower() or k in t_type for k in keywords):
+                if any(k in t_name.lower() or k in t_type for k in keywords):
+                    item_key = f"{p['name']}::{t_name}"
+                    interval_hours = parse_interval_hours(t_interval)
+
+                    # Check cooldown against cache
+                    last_alerted_str = cache.get(item_key, {}).get("last_alerted_at")
+                    is_due = False
+
+                    if force or not last_alerted_str:
+                        is_due = True
+                    else:
+                        try:
+                            last_alerted_dt = datetime.datetime.fromisoformat(last_alerted_str)
+                            hours_passed = (now_utc - last_alerted_dt).total_seconds() / 3600.0
+                            if hours_passed >= interval_hours:
+                                is_due = True
+                        except Exception:
+                            is_due = True
+
+                    if is_due:
+                        due_items.append({
+                            "key": item_key,
                             "project": p["name"],
-                            "task": t.get("name"),
-                            "token": intel.get("reward_token") or "Token Alpha",
+                            "task": t_name,
+                            "token": intel.get("reward_token") or "$ALPHA",
                             "network": intel.get("network") or intel.get("network_type") or "Web3 EVM",
                             "url": intel.get("dashboard_url") or DASHBOARD_BASE_URL,
-                            "interval": t.get("interval", "Siap Klaim"),
+                            "interval": t_interval,
+                            "interval_hours": interval_hours,
                         })
 
-    if len(urgent_items) > 0:
-        Log.success(f"Ditemukan {len(urgent_items)} aset/faucet siap klaim atau swap!")
+    if len(due_items) > 0:
+        Log.success(f"Ditemukan {len(due_items)} aset/faucet/NFT yang SUDAH WAKTUNYA diklaim!")
 
         fields = []
-        for item in urgent_items[:6]:
+        for item in due_items[:6]:
             fields.append({
-                "name": f"🪙 {item['project']}",
+                "name": f"🪙 {item['project']} — {item['task']}",
                 "value": (
-                    f"**Asset / Koin:** `${item['token']}` | **Network:** `{item['network']}`\n"
-                    f"⚡ **Tugas:** `{item['task']}` ({item['interval']})\n"
-                    f"🔗 **Link Aksi:** [Buka Portal Resmi untuk Klaim / Swap]({item['url']})"
+                    f"**Reward / Token:** `{item['token']}` | **Network:** `{item['network']}`\n"
+                    f"⏳ **Siklus Cooldown:** `{item['interval']}` (Cooldown selesai, siap diklaim!)\n"
+                    f"🔗 **Link Klaim Langsung:** [Buka Portal Resmi]({item['url']})"
                 ),
                 "inline": False,
             })
 
         embed = {
-            "title": f"🚨 [URGENT ALPHA ALERT] {len(urgent_items)} Aset Siap Diklaim & Di-Swap!",
+            "title": f"🚨 [WAKTUNYA KLAIM!] {len(due_items)} Aset & Faucet Siap Diambil!",
             "description": (
-                f"Waktunya mengamankan aset garapan Web3! Terdeteksi **{len(urgent_items)} tugas klaim faucet, withdraw, atau DEX swap** yang sudah siap dieksekusi sekarang:\n\n"
-                f"🔗 [Buka Dasbor Vault Koin & Faucet]({DASHBOARD_BASE_URL}/assets)\n"
-                f"⚡ [Eksekusi Otomatis di Command Center]({DASHBOARD_BASE_URL}/command)"
+                f"Berdasarkan jadwal data info cooldown, **{len(due_items)} tugas klaim koin/NFT/swap** "
+                f"telah mencapai waktu eksekusi dan siap Anda ambil sekarang:\n\n"
+                f"🔗 [Buka Vault Koin & Faucet]({DASHBOARD_BASE_URL}/assets)\n"
+                f"⚡ [Buka Command Center]({DASHBOARD_BASE_URL}/command)"
             ),
             "color": 0xEF4444,  # Neon Red (Urgent)
             "fields": fields,
             "footer": {
-                "text": f"dcasper3 Urgent Asset Vault • Dolphin Profile {DOLPHIN_PROFILE_ID} • {get_current_wib_time()}"
+                "text": f"dcasper3 Cooldown Engine • Dolphin Profile {DOLPHIN_PROFILE_ID} • {get_current_wib_time()}"
             },
             "timestamp": datetime.datetime.utcnow().isoformat(),
         }
 
         content_alert = (
-            f"🚨🚨🚨 **[URGENT: KLAIM ASSET & SWAP READY]** 🚨🚨🚨\n"
-            f"Waktunya klaim koin/faucet & swap token garapan airdrop Anda! "
-            f"Terdeteksi **{len(urgent_items)} peluang aset** yang siap diproses sekarang:"
+            f"🚨🚨🚨 **[ALERT: WAKTUNYA KLAIM ASSET & NFT]** 🚨🚨🚨\n"
+            f"Waktunya klaim aset harian & panen reward airdrop Anda! "
+            f"Terdapat **{len(due_items)} garapan** yang cooldown-nya sudah selesai:"
         )
 
         send_discord_chat(content=content_alert, embeds=[embed])
-        return len(urgent_items)
+
+        # Update cache to avoid spam until next interval
+        for item in due_items:
+            cache[item["key"]] = {
+                "last_alerted_at": now_utc.isoformat(),
+                "interval_hours": item["interval_hours"],
+                "project": item["project"],
+                "task": item["task"]
+            }
+        save_claim_cache(cache)
+
+        return len(due_items)
     else:
-        Log.info("Belum ada faucet atau aset baru yang siap diklaim/swap saat ini.")
+        Log.info("Belum ada faucet atau aset baru yang mencapai jadwal waktu klaim (semua masih dalam siklus cooldown).")
         return 0
 
 
@@ -675,13 +750,13 @@ def main():
         return
 
     if args.urgent_check:
-        check_urgent_asset_claims()
+        check_urgent_asset_claims(force=True)
         return
 
     if args.hourly:
         execute_hourly_recap()
         check_execution_reminders()
-        check_urgent_asset_claims()
+        check_urgent_asset_claims(force=False)
         return
 
     if args.scan:
@@ -701,6 +776,7 @@ def main():
             else:
                 scan_airdrop_opportunities()
             check_execution_reminders()
+            check_urgent_asset_claims(force=False)
 
             # Sleep until next 20-minute slot (:00, :20, :40)
             now_dt = datetime.datetime.now(WIB)
@@ -721,9 +797,11 @@ def main():
         scan_airdrop_opportunities()
 
     check_execution_reminders()
+    check_urgent_asset_claims(force=False)
 
 
 if __name__ == "__main__":
     main()
+
 
 

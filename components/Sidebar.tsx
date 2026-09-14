@@ -14,6 +14,7 @@ import {
   Activity,
   ChevronRight,
   Coins,
+  MessageSquare,
 } from "lucide-react";
 import { logout } from "@/lib/auth";
 import { supabase } from "@/lib/supabaseClient";
@@ -75,6 +76,14 @@ export const Sidebar: React.FC = () => {
       badge: "VAULT",
       badgeColor: "bg-amber-950 text-amber-400 border-amber-800/80",
       description: "Klaim, Faucet & Swaps",
+    },
+    {
+      name: "Intel AI Chat",
+      href: "/chat",
+      icon: MessageSquare,
+      badge: "RESEARCH",
+      badgeColor: "bg-purple-950 text-purple-400 border-purple-800/80",
+      description: "Q&A Web Researcher",
     },
   ];
 

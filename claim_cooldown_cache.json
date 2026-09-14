@@ -1,0 +1,110 @@
+{
+  "Story Protocol Odyssey Testnet::Register IP Asset via Faucet": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 12.0,
+    "project": "Story Protocol Odyssey Testnet",
+    "task": "Register IP Asset via Faucet"
+  },
+  "Story Protocol Odyssey Testnet::Mint Royalty License Token": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Story Protocol Odyssey Testnet",
+    "task": "Mint Royalty License Token"
+  },
+  "Movement Network Olympus (MoveVM L2)::Faucet 10 MOVE tokens": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Movement Network Olympus (MoveVM L2)",
+    "task": "Faucet 10 MOVE tokens"
+  },
+  "Movement Network Olympus (MoveVM L2)::Swap on Razor DEX (MoveVM)": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Movement Network Olympus (MoveVM L2)",
+    "task": "Swap on Razor DEX (MoveVM)"
+  },
+  "Sonic Labs (Fantom 2.0 Super-Fast L1)::Sonic Speed Swap on DEX": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Sonic Labs (Fantom 2.0 Super-Fast L1)",
+    "task": "Sonic Speed Swap on DEX"
+  },
+  "Initia Public Incentivized Testnet::Feed Jennie Pet Daily (XP)": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Initia Public Incentivized Testnet",
+    "task": "Feed Jennie Pet Daily (XP)"
+  },
+  "Initia Public Incentivized Testnet::Complete Interwoven Swaps": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Initia Public Incentivized Testnet",
+    "task": "Complete Interwoven Swaps"
+  },
+  "Fuel Network Ignition Mainnet::Trade on SwaySwap": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Fuel Network Ignition Mainnet",
+    "task": "Trade on SwaySwap"
+  },
+  "MegaETH Devnet Acceleration::Claim MegaETH Faucet ETH": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "MegaETH Devnet Acceleration",
+    "task": "Claim MegaETH Faucet ETH"
+  },
+  "Monad Ecosystem Testnet::Claim MON Testnet Faucet": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Monad Ecosystem Testnet",
+    "task": "Claim MON Testnet Faucet"
+  },
+  "Monad Ecosystem Testnet::MonadSwap Liquidity Interaction": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Monad Ecosystem Testnet",
+    "task": "MonadSwap Liquidity Interaction"
+  },
+  "Scroll Canvas (ZK-Rollup Badges)::Mint Scroll Canvas Profile NFT": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Scroll Canvas (ZK-Rollup Badges)",
+    "task": "Mint Scroll Canvas Profile NFT"
+  },
+  "Scroll Canvas (ZK-Rollup Badges)::Claim Ethereum Year Badge Attestation": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Scroll Canvas (ZK-Rollup Badges)",
+    "task": "Claim Ethereum Year Badge Attestation"
+  },
+  "Berachain Artio (PoL Testnet)::Request 0.1 BERA from Testnet Faucet": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 8.0,
+    "project": "Berachain Artio (PoL Testnet)",
+    "task": "Request 0.1 BERA from Testnet Faucet"
+  },
+  "Berachain Artio (PoL Testnet)::BEX Swap BERA -> HONEY Stablecoin": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Berachain Artio (PoL Testnet)",
+    "task": "BEX Swap BERA -> HONEY Stablecoin"
+  },
+  "Berachain Artio (PoL Testnet)::Bend Deposit HONEY to Mint BGT": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Berachain Artio (PoL Testnet)",
+    "task": "Bend Deposit HONEY to Mint BGT"
+  },
+  "Grass Network (GetGrass.io)::Daily Referral Bonus Claim": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 24.0,
+    "project": "Grass Network (GetGrass.io)",
+    "task": "Daily Referral Bonus Claim"
+  },
+  "Eclipse SVM Mainnet Launch::Execute 5 DEX Swaps on Lifinity SVM": {
+    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "interval_hours": 168.0,
+    "project": "Eclipse SVM Mainnet Launch",
+    "task": "Execute 5 DEX Swaps on Lifinity SVM"
+  }
+}
