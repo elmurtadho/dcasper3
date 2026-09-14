@@ -394,10 +394,82 @@ async function executeAutonomousRadarScan(forceHourly = false) {
   };
 }
 
+// Special Urgent Asset Claim / Swap Alert Routine
+async function executeUrgentAssetAlert() {
+  const existing = await getExistingProjects();
+  const keywords = ["faucet", "claim", "swap", "withdraw", "mint", "redeem", "harvest"];
+
+  const urgentItems: any[] = [];
+  const seen = new Set();
+
+  for (const p of existing) {
+    const intel = p.intel_data || {};
+    const tasks = intel.tasks || [];
+    for (const t of tasks) {
+      const tName = String(t.name || "").toLowerCase();
+      const tType = String(t.type || "").toLowerCase();
+      const tStatus = String(t.status || "").toLowerCase();
+
+      if (tStatus === "ready" || tStatus === "operational") {
+        if (keywords.some((k) => tName.includes(k) || tType.includes(k))) {
+          const key = `${p.name}-${t.name}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            urgentItems.push({
+              project: p.name,
+              task: t.name,
+              token: intel.reward_token || "Token Alpha",
+              network: intel.network || intel.network_type || "Web3 EVM",
+              url: intel.dashboard_url || DASHBOARD_BASE_URL,
+              interval: t.interval || "Siap Klaim",
+            });
+          }
+        }
+      }
+    }
+  }
+
+  if (urgentItems.length > 0) {
+    const fields = urgentItems.slice(0, 6).map((item) => ({
+      name: `🪙 ${item.project}`,
+      value: `**Asset / Koin:** \`$${item.token}\` | **Network:** \`${item.network}\`\n⚡ **Tugas:** \`${item.task}\` (${item.interval})\n🔗 **Link Aksi:** [Buka Portal Resmi untuk Klaim / Swap](${item.url})`,
+      inline: false,
+    }));
+
+    const embed = {
+      title: `🚨 [URGENT ALPHA ALERT] ${urgentItems.length} Aset Siap Diklaim & Di-Swap!`,
+      description: `Waktunya mengamankan aset garapan Web3! Terdeteksi **${urgentItems.length} tugas klaim faucet, withdraw, atau DEX swap** yang sudah siap dieksekusi sekarang:\n\n🔗 [Buka Dasbor Vault Koin & Faucet](${DASHBOARD_BASE_URL}/assets)\n⚡ [Eksekusi Otomatis di Command Center](${DASHBOARD_BASE_URL}/command)`,
+      color: 0xef4444, // Neon Red (Urgent)
+      fields,
+      footer: {
+        text: `dcasper3 Urgent Asset Vault • Dolphin Profile ${DOLPHIN_PROFILE_ID} • ${formatWibTime()}`,
+      },
+      timestamp: new Date().toISOString(),
+    };
+
+    const contentAlert = `🚨🚨🚨 **[URGENT: KLAIM ASSET & SWAP READY]** 🚨🚨🚨\nWaktunya klaim koin/faucet & swap token garapan airdrop Anda! Terdeteksi **${urgentItems.length} peluang aset** yang siap diproses sekarang:`;
+
+    await sendDiscordWebhook(contentAlert, [embed]);
+  }
+
+  return {
+    success: true,
+    urgentItemsCount: urgentItems.length,
+    timestamp: new Date().toISOString(),
+  };
+}
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const forceHourly = searchParams.get("hourly") === "true";
+    const isUrgent = searchParams.get("urgent") === "true";
+
+    if (isUrgent) {
+      const result = await executeUrgentAssetAlert();
+      return NextResponse.json(result);
+    }
+
     const result = await executeAutonomousRadarScan(forceHourly);
     return NextResponse.json(result);
   } catch (err: any) {
@@ -409,6 +481,13 @@ export async function POST(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const forceHourly = searchParams.get("hourly") === "true";
+    const isUrgent = searchParams.get("urgent") === "true";
+
+    if (isUrgent) {
+      const result = await executeUrgentAssetAlert();
+      return NextResponse.json(result);
+    }
+
     const result = await executeAutonomousRadarScan(forceHourly);
     return NextResponse.json(result);
   } catch (err: any) {

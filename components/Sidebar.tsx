@@ -13,6 +13,7 @@ import {
   Layers,
   Activity,
   ChevronRight,
+  Coins,
 } from "lucide-react";
 import { logout } from "@/lib/auth";
 import { supabase } from "@/lib/supabaseClient";
@@ -66,6 +67,14 @@ export const Sidebar: React.FC = () => {
       badge: activeCount > 0 ? `${activeCount}` : undefined,
       badgeColor: "bg-emerald-950 text-emerald-400 border-emerald-800/80",
       description: "Bot Farm Execution",
+    },
+    {
+      name: "Koin & Faucets",
+      href: "/assets",
+      icon: Coins,
+      badge: "VAULT",
+      badgeColor: "bg-amber-950 text-amber-400 border-amber-800/80",
+      description: "Klaim, Faucet & Swaps",
     },
   ];
 

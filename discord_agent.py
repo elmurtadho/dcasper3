@@ -567,6 +567,86 @@ def check_execution_reminders() -> None:
 
 
 # ==============================================================================
+# URGENT ASSET & FAUCET CLAIM / SWAP REMINDER LOGIC
+# ==============================================================================
+def check_urgent_asset_claims() -> int:
+    """
+    Pemeriksaan Khusus: Mendeteksi koin, faucet, dan aset staking yang sudah waktunya
+    untuk di-klaim, di-withdraw, atau di-swap. Mengirimkan Urgent Chat ke Discord.
+    """
+    Log.info("🚨 Memeriksa koin, faucet, dan aset yang siap diklaim / di-swap...")
+    projects = get_existing_projects()
+    keywords = ["faucet", "claim", "swap", "withdraw", "mint", "redeem", "harvest"]
+
+    urgent_items = []
+    seen_projects = set()
+
+    for p in projects:
+        intel = p.get("intel_data") or {}
+        tasks = intel.get("tasks") or []
+        for t in tasks:
+            t_name = str(t.get("name", "")).lower()
+            t_type = str(t.get("type", "")).lower()
+            t_status = str(t.get("status", "")).lower()
+
+            if t_status in ("ready", "operational"):
+                if any(k in t_name or k in t_type for k in keywords):
+                    item_key = f"{p['name']}-{t.get('name')}"
+                    if item_key not in seen_projects:
+                        seen_projects.add(item_key)
+                        urgent_items.append({
+                            "project": p["name"],
+                            "task": t.get("name"),
+                            "token": intel.get("reward_token") or "Token Alpha",
+                            "network": intel.get("network") or intel.get("network_type") or "Web3 EVM",
+                            "url": intel.get("dashboard_url") or DASHBOARD_BASE_URL,
+                            "interval": t.get("interval", "Siap Klaim"),
+                        })
+
+    if len(urgent_items) > 0:
+        Log.success(f"Ditemukan {len(urgent_items)} aset/faucet siap klaim atau swap!")
+
+        fields = []
+        for item in urgent_items[:6]:
+            fields.append({
+                "name": f"🪙 {item['project']}",
+                "value": (
+                    f"**Asset / Koin:** `${item['token']}` | **Network:** `{item['network']}`\n"
+                    f"⚡ **Tugas:** `{item['task']}` ({item['interval']})\n"
+                    f"🔗 **Link Aksi:** [Buka Portal Resmi untuk Klaim / Swap]({item['url']})"
+                ),
+                "inline": False,
+            })
+
+        embed = {
+            "title": f"🚨 [URGENT ALPHA ALERT] {len(urgent_items)} Aset Siap Diklaim & Di-Swap!",
+            "description": (
+                f"Waktunya mengamankan aset garapan Web3! Terdeteksi **{len(urgent_items)} tugas klaim faucet, withdraw, atau DEX swap** yang sudah siap dieksekusi sekarang:\n\n"
+                f"🔗 [Buka Dasbor Vault Koin & Faucet]({DASHBOARD_BASE_URL}/assets)\n"
+                f"⚡ [Eksekusi Otomatis di Command Center]({DASHBOARD_BASE_URL}/command)"
+            ),
+            "color": 0xEF4444,  # Neon Red (Urgent)
+            "fields": fields,
+            "footer": {
+                "text": f"dcasper3 Urgent Asset Vault • Dolphin Profile {DOLPHIN_PROFILE_ID} • {get_current_wib_time()}"
+            },
+            "timestamp": datetime.datetime.utcnow().isoformat(),
+        }
+
+        content_alert = (
+            f"🚨🚨🚨 **[URGENT: KLAIM ASSET & SWAP READY]** 🚨🚨🚨\n"
+            f"Waktunya klaim koin/faucet & swap token garapan airdrop Anda! "
+            f"Terdeteksi **{len(urgent_items)} peluang aset** yang siap diproses sekarang:"
+        )
+
+        send_discord_chat(content=content_alert, embeds=[embed])
+        return len(urgent_items)
+    else:
+        Log.info("Belum ada faucet atau aset baru yang siap diklaim/swap saat ini.")
+        return 0
+
+
+# ==============================================================================
 # CLI DISPATCHER
 # ==============================================================================
 def main():
@@ -574,6 +654,7 @@ def main():
     parser.add_argument("--scan", action="store_true", help="Run one Radar scan iteration")
     parser.add_argument("--remind", action="store_true", help="Run one execution reminder check")
     parser.add_argument("--hourly", action="store_true", help="Run Hourly Recap (Rekapan Per Jam)")
+    parser.add_argument("--urgent-check", action="store_true", help="Run urgent asset claim / swap alert")
     parser.add_argument("--test-discord", action="store_true", help="Send test handshake to Discord")
     parser.add_argument("--webhook", type=str, help="Specify Discord Webhook URL directly")
     parser.add_argument("--loop", action="store_true", help="Run continuous background scanning loop aligned with 00, 20, 40")
@@ -593,9 +674,14 @@ def main():
         send_discord_chat("🚀 **dcasper3 Discord Agent Connected!** Bot berhasil terhubung ke server Discord Anda.")
         return
 
+    if args.urgent_check:
+        check_urgent_asset_claims()
+        return
+
     if args.hourly:
         execute_hourly_recap()
         check_execution_reminders()
+        check_urgent_asset_claims()
         return
 
     if args.scan:
