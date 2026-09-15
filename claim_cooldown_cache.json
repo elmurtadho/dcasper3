@@ -78,7 +78,7 @@
     "task": "Claim Ethereum Year Badge Attestation"
   },
   "Berachain Artio (PoL Testnet)::Request 0.1 BERA from Testnet Faucet": {
-    "last_alerted_at": "2026-09-14T16:12:11.489269+00:00",
+    "last_alerted_at": "2026-09-15T00:20:04.394756+00:00",
     "interval_hours": 8.0,
     "project": "Berachain Artio (PoL Testnet)",
     "task": "Request 0.1 BERA from Testnet Faucet"

@@ -269,7 +269,7 @@ def resolve_dolphin_websocket(profile_id: str, start_data: Any) -> Optional[str]
 
 
 # Global execution flags
-DEFAULT_BURNER_WALLET: str = "0xAb5801a7D941c50D9524F53528bA33c467a84000"
+DEFAULT_BURNER_WALLET: str = "0x45A1E3e155570c31bbB0946636b51d648E62b27a"
 HEADLESS_MODE: bool = True  # Silent execution: Zero windows pop up on screen
 
 def start_dolphin_profile(profile_id: str = DOLPHIN_PROFILE_ID, headless: bool = HEADLESS_MODE) -> Optional[str]:

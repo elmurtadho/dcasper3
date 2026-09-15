@@ -106,9 +106,9 @@ export default function CommandPage() {
   const [isRealtime, setIsRealtime] = useState<boolean>(false);
   const [bannerNotice, setBannerNotice] = useState<string | null>(null);
   const [isRunningAll, setIsRunningAll] = useState<boolean>(false);
-  const [burnerWallet, setBurnerWallet] = useState<string>("0xAb5801a7D941c50D9524F53528bA33c467a84000");
+  const [burnerWallet, setBurnerWallet] = useState<string>("0x45A1E3e155570c31bbB0946636b51d648E62b27a");
   const [isEditingWallet, setIsEditingWallet] = useState<boolean>(false);
-  const [walletInput, setWalletInput] = useState<string>("");
+  const [walletInput, setWalletInput] = useState<string>("0x45A1E3e155570c31bbB0946636b51d648E62b27a");
   const [walletSavedToast, setWalletSavedToast] = useState<string | null>(null);
 
   // Load saved MetaMask Burner Wallet from localStorage
@@ -119,7 +119,9 @@ export default function CommandPage() {
         setBurnerWallet(saved);
         setWalletInput(saved);
       } else {
-        setWalletInput("0xAb5801a7D941c50D9524F53528bA33c467a84000");
+        setBurnerWallet("0x45A1E3e155570c31bbB0946636b51d648E62b27a");
+        setWalletInput("0x45A1E3e155570c31bbB0946636b51d648E62b27a");
+        localStorage.setItem("dcasper3_burner_wallet", "0x45A1E3e155570c31bbB0946636b51d648E62b27a");
       }
     } catch (e) {}
   }, []);

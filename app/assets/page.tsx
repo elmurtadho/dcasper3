@@ -52,6 +52,14 @@ export default function AssetsVaultPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSendingUrgent, setIsSendingUrgent] = useState<boolean>(false);
   const [urgentFeedback, setUrgentFeedback] = useState<string | null>(null);
+  const [burnerWallet, setBurnerWallet] = useState<string>("0x45A1E3e155570c31bbB0946636b51d648E62b27a");
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dcasper3_burner_wallet");
+      if (saved) setBurnerWallet(saved);
+    } catch (e) {}
+  }, []);
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -219,6 +227,42 @@ export default function AssetsVaultPage() {
           <span>{urgentFeedback}</span>
         </div>
       )}
+
+      {/* MetaMask Burner Target Bar */}
+      <div className="bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900 border border-amber-500/30 p-3.5 rounded-xl shadow-md flex items-center justify-between flex-wrap gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-base shrink-0">
+            🦊
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-white font-mono uppercase">Target MetaMask Burner</span>
+              <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded font-mono">Penerima Faucet & Koin</span>
+            </div>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="font-mono text-xs text-amber-300 font-semibold">{burnerWallet}</span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(burnerWallet);
+                  alert("Alamat burner berhasil dicopy!");
+                }}
+                className="text-[10px] text-slate-400 hover:text-white px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700"
+              >
+                📋 Copy
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/command"
+            className="text-xs text-cyan-400 hover:text-cyan-300 font-mono flex items-center gap-1 border border-cyan-800/60 bg-cyan-950/30 px-3 py-1.5 rounded-lg transition"
+          >
+            <span>⚡ Eksekusi Klaim di Command Center</span>
+            <span>➔</span>
+          </Link>
+        </div>
+      </div>
 
       {/* HUD Overview Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
