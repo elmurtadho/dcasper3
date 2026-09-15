@@ -398,109 +398,109 @@ def execute_web3_farming_task(project: Dict[str, Any], ws_endpoint: Optional[str
             except Exception as nav_err:
                 Log.warning(f"Navigation notice: {nav_err} (continuing execution cycle)")
 
-    # Extract MetaMask Burner Wallet target from payload or environment
-    wallet_match = re.search(r"--wallet=([0-9a-zA-ZxX]+)", command_payload)
-    burner_wallet = (
-        wallet_match.group(1)
-        if wallet_match
-        else os.getenv("METAMASK_BURNER_WALLET", DEFAULT_BURNER_WALLET)
-    )
-
-    # Step 2: Parse and Execute Payload Commands
-    # 2.1: Automatic MetaMask Burner Wallet Faucet & Reward Claim
-    if any(k in command_payload.lower() for k in ("faucet", "claim", "reward", "mint", "drip")):
-        Log.info(f"Targeting MetaMask Burner Wallet for airdrop/faucet claim: {burner_wallet}")
-        try:
-            # Check for wallet address input on faucet / claim page
-            selectors = [
-                'input[placeholder*="0x" i]',
-                'input[placeholder*="address" i]',
-                'input[placeholder*="wallet" i]',
-                'input[name*="address" i]',
-                'input[type="text"]',
-            ]
-            filled = False
-            for sel in selectors:
-                inputs = page.locator(sel)
-                if inputs.count() > 0:
-                    first_inp = inputs.first
-                    if first_inp.is_visible():
-                        first_inp.click()
-                        first_inp.fill(burner_wallet)
-                        Log.success(f"Autofilled Burner Wallet {burner_wallet} into form selector '{sel}'")
-                        filled = True
-                        time.sleep(1)
-                        break
-
-            # Trigger claim/drip action button
-            btn_selectors = [
-                'button:has-text("Drip")',
-                'button:has-text("Claim")',
-                'button:has-text("Request")',
-                'button:has-text("Send")',
-                'button:has-text("Get")',
-                'button:has-text("Mint")',
-            ]
-            for btn_sel in btn_selectors:
-                btns = page.locator(btn_sel)
-                if btns.count() > 0 and btns.first.is_visible():
-                    btns.first.click()
-                    Log.success(f"Triggered claim button '{btn_sel}' successfully!")
-                    time.sleep(2)
-                    break
-
-            insert_farming_log(
-                project_id,
-                f"Reward/faucet klaim disubmit ke MetaMask Burner Wallet: {burner_wallet}",
-                status="success",
+            # Extract MetaMask Burner Wallet target from payload or environment
+            wallet_match = re.search(r"--wallet=([0-9a-zA-ZxX]+)", command_payload)
+            burner_wallet = (
+                wallet_match.group(1)
+                if wallet_match
+                else os.getenv("METAMASK_BURNER_WALLET", DEFAULT_BURNER_WALLET)
             )
-        except Exception as claim_err:
-            Log.warning(f"Notice on burner wallet claim flow: {claim_err}")
 
-    if "--task=uptime_check" in command_payload or "Grass" in project_name:
-        Log.info("Executing Grass Bandwidth Node telemetry audit...")
-        title = page.title()
-        insert_farming_log(
-            project_id,
-            f"Grass Network audit complete. Page title: '{title}'. Node ping: operational (98%).",
-            status="success",
-        )
+            # Step 2: Parse and Execute Payload Commands
+            # 2.1: Automatic MetaMask Burner Wallet Faucet & Reward Claim
+            if any(k in command_payload.lower() for k in ("faucet", "claim", "reward", "mint", "drip")):
+                Log.info(f"Targeting MetaMask Burner Wallet for airdrop/faucet claim: {burner_wallet}")
+                try:
+                    # Check for wallet address input on faucet / claim page
+                    selectors = [
+                        'input[placeholder*="0x" i]',
+                        'input[placeholder*="address" i]',
+                        'input[placeholder*="wallet" i]',
+                        'input[name*="address" i]',
+                        'input[type="text"]',
+                    ]
+                    filled = False
+                    for sel in selectors:
+                        inputs = page.locator(sel)
+                        if inputs.count() > 0:
+                            first_inp = inputs.first
+                            if first_inp.is_visible():
+                                first_inp.click()
+                                first_inp.fill(burner_wallet)
+                                Log.success(f"Autofilled Burner Wallet {burner_wallet} into form selector '{sel}'")
+                                filled = True
+                                time.sleep(1)
+                                break
 
-    elif "--task=claim_daily" in command_payload or "Nodepay" in project_name:
-        Log.info("Executing daily reward / check-in verification...")
-        time.sleep(1.5)
-        insert_farming_log(
-            project_id,
-            f"Nodepay AI claim sequence executed. Target Burner: {burner_wallet[:8]}...",
-            status="success",
-        )
+                    # Trigger claim/drip action button
+                    btn_selectors = [
+                        'button:has-text("Drip")',
+                        'button:has-text("Claim")',
+                        'button:has-text("Request")',
+                        'button:has-text("Send")',
+                        'button:has-text("Get")',
+                        'button:has-text("Mint")',
+                    ]
+                    for btn_sel in btn_selectors:
+                        btns = page.locator(btn_sel)
+                        if btns.count() > 0 and btns.first.is_visible():
+                            btns.first.click()
+                            Log.success(f"Triggered claim button '{btn_sel}' successfully!")
+                            time.sleep(2)
+                            break
 
-    elif "--task=faucet_request" in command_payload or "Monad" in project_name:
-        Log.info("Executing Monad Testnet Faucet & DEX swap routine...")
-        time.sleep(2)
-        insert_farming_log(
-            project_id,
-            f"Monad Testnet Faucet diarahkan ke MetaMask Burner: {burner_wallet}. Gas estimation: 0.002 MON.",
-            status="success",
-        )
+                    insert_farming_log(
+                        project_id,
+                        f"Reward/faucet klaim disubmit ke MetaMask Burner Wallet: {burner_wallet}",
+                        status="success",
+                    )
+                except Exception as claim_err:
+                    Log.warning(f"Notice on burner wallet claim flow: {claim_err}")
 
-    elif "--task=streak_checkin" in command_payload or "Layer3" in project_name:
-        Log.info("Executing Layer3 GM Streak check-in...")
-        time.sleep(1.5)
-        insert_farming_log(
-            project_id,
-            f"Layer3 Daily GM Streak successfully signed for Burner: {burner_wallet[:8]}...",
-            status="success",
-        )
+            if "--task=uptime_check" in command_payload or "Grass" in project_name:
+                Log.info("Executing Grass Bandwidth Node telemetry audit...")
+                title = page.title()
+                insert_farming_log(
+                    project_id,
+                    f"Grass Network audit complete. Page title: '{title}'. Node ping: operational (98%).",
+                    status="success",
+                )
 
-    else:
-        Log.info(f"Executing Web3 payload task: {command_payload}")
-        time.sleep(2)
-        insert_farming_log(
-            project_id,
-            f"Task '{command_payload}' completed. Target: {burner_wallet[:8]}...",
-            status="success",
-        )
+            elif "--task=claim_daily" in command_payload or "Nodepay" in project_name:
+                Log.info("Executing daily reward / check-in verification...")
+                time.sleep(1.5)
+                insert_farming_log(
+                    project_id,
+                    f"Nodepay AI claim sequence executed. Target Burner: {burner_wallet[:8]}...",
+                    status="success",
+                )
+
+            elif "--task=faucet_request" in command_payload or "Monad" in project_name:
+                Log.info("Executing Monad Testnet Faucet & DEX swap routine...")
+                time.sleep(2)
+                insert_farming_log(
+                    project_id,
+                    f"Monad Testnet Faucet diarahkan ke MetaMask Burner: {burner_wallet}. Gas estimation: 0.002 MON.",
+                    status="success",
+                )
+
+            elif "--task=streak_checkin" in command_payload or "Layer3" in project_name:
+                Log.info("Executing Layer3 GM Streak check-in...")
+                time.sleep(1.5)
+                insert_farming_log(
+                    project_id,
+                    f"Layer3 Daily GM Streak successfully signed for Burner: {burner_wallet[:8]}...",
+                    status="success",
+                )
+
+            else:
+                Log.info(f"Executing Web3 payload task: {command_payload}")
+                time.sleep(2)
+                insert_farming_log(
+                    project_id,
+                    f"Task '{command_payload}' completed. Target: {burner_wallet[:8]}...",
+                    status="success",
+                )
 
             # Close standalone browser if we created our own headless instance
             if not ws_endpoint:
