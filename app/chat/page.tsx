@@ -171,37 +171,37 @@ export default function IntelChatPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-2rem)] max-w-6xl mx-auto space-y-4">
+    <div className="flex flex-col h-[calc(100vh-6.5rem)] lg:h-[calc(100vh-4rem)] p-2.5 sm:p-6 max-w-6xl mx-auto space-y-3 sm:space-y-4 w-full">
       {/* Header Banner */}
-      <div className="flex items-center justify-between bg-slate-900/90 border border-slate-800 p-4 rounded-xl shadow-lg backdrop-blur-md">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-900/90 border border-slate-800 p-3 sm:p-4 rounded-xl shadow-lg backdrop-blur-md gap-3 shrink-0">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center text-white text-xl shadow-cyan-500/20 shadow-md">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center text-white text-lg sm:text-xl shadow-cyan-500/20 shadow-md shrink-0">
             💬
           </div>
           <div>
-            <h1 className="text-xl font-bold text-white tracking-wide flex items-center gap-2">
-              Intel AI Chat & Web Researcher
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 uppercase font-mono">
+            <h1 className="text-base sm:text-xl font-bold text-white tracking-wide flex items-center gap-1.5 sm:gap-2">
+              Intel AI Chat
+              <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 uppercase font-mono">
                 Live Scanner
               </span>
             </h1>
-            <p className="text-xs text-slate-400">
-              Riset airdrop Web3 profesional, live web parser, dan penanda status proyek otomatis
+            <p className="text-[11px] sm:text-xs text-slate-400">
+              Riset airdrop Web3 profesional & live web parser
             </p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar pb-0.5 sm:pb-0">
           <button
             onClick={() => setShowVisualGuide(!showVisualGuide)}
-            className="px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 text-xs font-medium transition flex items-center gap-1.5"
+            className="px-2.5 sm:px-3 py-1.5 rounded-lg border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 text-xs font-medium transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
             <span>👀</span>
-            <span>{showVisualGuide ? "Tutup Visual Guide" : "Lihat Bentukan Web dApp"}</span>
+            <span>{showVisualGuide ? "Tutup Guide" : "Visual Guide"}</span>
           </button>
           <Link
             href="/assets"
-            className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition flex items-center gap-1.5"
+            className="px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition flex items-center gap-1.5 whitespace-nowrap shrink-0"
           >
             <span>🪙</span>
             <span>Vault Koin</span>
@@ -282,7 +282,7 @@ export default function IntelChatPage() {
       )}
 
       {/* Main Chat Thread */}
-      <div className="flex-1 bg-slate-950/70 border border-slate-800/80 rounded-xl p-4 overflow-y-auto space-y-4 shadow-inner">
+      <div className="flex-1 min-h-0 bg-slate-950/70 border border-slate-800/80 rounded-xl p-3 sm:p-4 overflow-y-auto space-y-3 sm:space-y-4 shadow-inner">
         {messages.map((m) => (
           <div
             key={m.id}
@@ -296,7 +296,7 @@ export default function IntelChatPage() {
             </div>
 
             <div
-              className={`max-w-3xl rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-md ${
+              className={`max-w-[94%] sm:max-w-2xl lg:max-w-3xl rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm leading-relaxed shadow-md ${
                 m.role === "user"
                   ? "bg-blue-600 text-white rounded-br-none"
                   : "bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none"
@@ -469,19 +469,19 @@ export default function IntelChatPage() {
           e.preventDefault();
           handleSend();
         }}
-        className="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 p-2 rounded-xl shadow-lg"
+        className="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 p-1.5 sm:p-2 rounded-xl shadow-lg shrink-0"
       >
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Tanyakan peluang airdrop, tempel URL web untuk riset live, atau tanya status koin..."
-          className="flex-1 bg-transparent px-3 py-2 text-xs md:text-sm text-white placeholder-slate-500 focus:outline-none"
+          placeholder="Tanyakan peluang airdrop, tempel URL web untuk riset live, atau status koin..."
+          className="flex-1 bg-transparent px-2.5 sm:px-3 py-1.5 sm:py-2 text-sm text-white placeholder-slate-500 focus:outline-none"
         />
         <button
           type="submit"
           disabled={!input.trim() || loading}
-          className="px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5"
+          className="px-3.5 sm:px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold shadow-md transition flex items-center gap-1.5 shrink-0"
         >
           <span>Kirim</span>
           <span>➔</span>

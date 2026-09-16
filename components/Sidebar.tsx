@@ -15,11 +15,17 @@ import {
   ChevronRight,
   Coins,
   MessageSquare,
+  X,
 } from "lucide-react";
 import { logout } from "@/lib/auth";
 import { supabase } from "@/lib/supabaseClient";
 
-export const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen = false, onClose }) => {
   const pathname = usePathname();
   const [scoutedCount, setScoutedCount] = useState<number>(0);
   const [activeCount, setActiveCount] = useState<number>(0);
@@ -87,23 +93,37 @@ export const Sidebar: React.FC = () => {
     },
   ];
 
-  return (
-    <aside className="w-64 bg-[#080d19] border-r border-slate-800 flex flex-col justify-between shrink-0 select-none z-30 h-screen sticky top-0">
+  const renderContent = (isMobile: boolean = false) => (
+    <div className="flex flex-col justify-between h-full">
       {/* Top Section: Branding & Navigation */}
-      <div className="p-5 space-y-6">
-        {/* Branding */}
-        <div className="flex items-center gap-3 pb-5 border-b border-slate-800/80">
-          <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]">
-            <Terminal className="w-5 h-5 fill-current" />
+      <div className="p-5 space-y-6 overflow-y-auto">
+        {/* Branding & Mobile Close */}
+        <div className="flex items-center justify-between pb-5 border-b border-slate-800/80">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-black shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+              <Terminal className="w-5 h-5 fill-current" />
+            </div>
+            <div>
+              <h2 className="text-sm font-black font-mono tracking-wider text-white uppercase">
+                WEB3 COMMAND
+              </h2>
+              <p className="text-[10px] font-mono text-cyan-400 tracking-wide">
+                AUTO-FARMING ENGINE
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-sm font-black font-mono tracking-wider text-white uppercase">
-              WEB3 COMMAND
-            </h2>
-            <p className="text-[10px] font-mono text-cyan-400 tracking-wide">
-              AUTO-FARMING ENGINE
-            </p>
-          </div>
+
+          {/* Close button on mobile drawer */}
+          {isMobile && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded-lg bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Navigation Items */}
@@ -120,6 +140,9 @@ export const Sidebar: React.FC = () => {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => {
+                  if (isMobile && onClose) onClose();
+                }}
                 className={`group flex items-center justify-between px-3.5 py-3 rounded-xl text-xs transition-all relative ${
                   isActive
                     ? "bg-slate-900/90 text-white border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.15)] font-bold"
@@ -161,7 +184,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Bottom Section: System Telemetry & Operator Session */}
-      <div className="p-4 border-t border-slate-800/80 space-y-3 bg-[#060a14]/60 font-mono">
+      <div className="p-4 border-t border-slate-800/80 space-y-3 bg-[#060a14]/60 font-mono shrink-0">
         {/* Node & Dolphin Telemetry */}
         <div className="p-2.5 rounded-lg bg-slate-950/80 border border-slate-800 text-[11px] space-y-1">
           <div className="flex items-center justify-between text-slate-400">
@@ -198,6 +221,32 @@ export const Sidebar: React.FC = () => {
           </button>
         </div>
       </div>
-    </aside>
+    </div>
+  );
+
+  return (
+    <>
+      {/* 1. Desktop Sticky Sidebar (Visible on lg: 1024px+) */}
+      <aside className="hidden lg:flex w-64 bg-[#080d19] border-r border-slate-800 flex-col justify-between shrink-0 select-none z-30 h-screen sticky top-0">
+        {renderContent(false)}
+      </aside>
+
+      {/* 2. Mobile / Tablet Slide-over Drawer (Visible on screens < 1024px when isOpen is true) */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop Blur Overlay */}
+          <div
+            onClick={onClose}
+            className="fixed inset-0 bg-black/75 backdrop-blur-sm transition-opacity"
+            aria-hidden="true"
+          />
+
+          {/* Drawer Body */}
+          <div className="relative w-72 max-w-[85vw] bg-[#080d19] border-r border-slate-800 h-full z-10 flex flex-col shadow-2xl">
+            {renderContent(true)}
+          </div>
+        </div>
+      )}
+    </>
   );
 };

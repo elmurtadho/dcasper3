@@ -39,7 +39,7 @@ export const IntelAccordion: React.FC<IntelAccordionProps> = ({ intel }) => {
   };
 
   return (
-    <div className="p-5 bg-[#0a0f1d] border-t border-slate-800/80 space-y-5">
+    <div className="p-3.5 sm:p-5 bg-[#0a0f1d] border-t border-slate-800/80 space-y-4 sm:space-y-5">
       {/* Top Meta Badges */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800/60">
         <div className="flex flex-wrap items-center gap-2">
@@ -112,11 +112,11 @@ export const IntelAccordion: React.FC<IntelAccordionProps> = ({ intel }) => {
               intel.tasks.map((task, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-2.5 rounded bg-slate-950/70 border border-slate-800/80 text-xs"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-2.5 rounded bg-slate-950/70 border border-slate-800/80 text-xs gap-2"
                 >
                   <div className="space-y-0.5">
                     <span className="font-medium text-slate-200">{task.name}</span>
-                    <div className="flex items-center gap-2 text-[11px] text-slate-400 font-mono">
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 font-mono">
                       {task.interval && <span>Interval: {task.interval}</span>}
                       {task.reward && <span className="text-emerald-400">Reward: {task.reward}</span>}
                       {task.cooldown_hrs && (
@@ -124,7 +124,7 @@ export const IntelAccordion: React.FC<IntelAccordionProps> = ({ intel }) => {
                       )}
                     </div>
                   </div>
-                  <div>{getTaskStatusBadge(task.status)}</div>
+                  <div className="self-start sm:self-auto">{getTaskStatusBadge(task.status)}</div>
                 </div>
               ))
             ) : (

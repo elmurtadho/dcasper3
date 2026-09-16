@@ -350,20 +350,20 @@ export default function CommandPage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-3.5 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-800/80 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 sm:pb-6 border-b border-slate-800/80 gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]">
-              <Zap className="w-5 h-5 fill-current" />
+            <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.4)] shrink-0">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black font-mono tracking-wider text-white uppercase">
+                <h1 className="text-lg sm:text-2xl font-black font-mono tracking-wider text-white uppercase">
                   Command Center
                 </h1>
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/60">
+                <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-800/60">
                   EXECUTION PIPELINE
                 </span>
               </div>
@@ -375,12 +375,12 @@ export default function CommandPage() {
         </div>
 
         {/* Action & Telemetry Controls */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleRunAll}
             disabled={isLoading || isRunningAll || projects.length === 0}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-mono font-black text-xs flex items-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.35)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-mono font-black text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.35)] active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isRunningAll ? (
               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -392,7 +392,7 @@ export default function CommandPage() {
 
           <Link
             href="/"
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center gap-1.5 transition-all"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center gap-1.5 transition-all"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Radar Intel</span>
@@ -402,7 +402,7 @@ export default function CommandPage() {
             type="button"
             onClick={fetchActiveData}
             disabled={isLoading}
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-cyan-400" : ""}`} />
             <span>Refresh</span>
@@ -411,35 +411,35 @@ export default function CommandPage() {
       </div>
 
       {/* MetaMask Burner Vault Target & Silent Mode Bar */}
-      <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-emerald-950/30 border border-amber-500/30 p-4 rounded-2xl shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4 backdrop-blur-sm">
-        <div className="flex items-start md:items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
+      <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-emerald-950/30 border border-amber-500/30 p-3.5 sm:p-4 rounded-2xl shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4 backdrop-blur-sm">
+        <div className="flex items-start md:items-center gap-3 sm:gap-3.5 w-full md:w-auto">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-xl sm:text-2xl shadow-[0_0_15px_rgba(245,158,11,0.3)] shrink-0">
             🦊
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-xs sm:text-sm font-bold font-mono text-white tracking-wide uppercase">
                 MetaMask Burner Vault Target
               </h2>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
+              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                MODE HENING (HEADLESS AKTIF - 0 POPUP)
+                MODE HENING (0 POPUP)
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Seluruh koin faucet testnet & reward airdrop yang diklaim bot otomatis diarahkan ke wallet ini tanpa membuka jendela visual di layar Anda.
+            <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
+              Seluruh koin faucet testnet & reward airdrop diarahkan ke wallet ini tanpa membuka jendela browser visual.
             </p>
 
             {/* Address Display / Input */}
             <div className="mt-2 flex items-center gap-2 flex-wrap">
               {isEditingWallet ? (
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap w-full">
                   <input
                     type="text"
                     value={walletInput}
                     onChange={(e) => setWalletInput(e.target.value)}
                     placeholder="0x..."
-                    className="bg-slate-950 border border-amber-500/50 rounded-lg px-3 py-1 text-xs text-amber-200 font-mono focus:outline-none focus:border-amber-400 w-72"
+                    className="bg-slate-950 border border-amber-500/50 rounded-lg px-3 py-1 text-xs text-amber-200 font-mono focus:outline-none focus:border-amber-400 w-full sm:w-72 max-w-full"
                   />
                   <button
                     onClick={handleSaveWallet}
@@ -456,7 +456,7 @@ export default function CommandPage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-amber-300 font-semibold tracking-wider select-all">
+                  <span className="font-mono text-[11px] sm:text-xs px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-amber-300 font-semibold tracking-wider select-all break-all sm:break-normal">
                     {burnerWallet}
                   </span>
                   <button
@@ -465,7 +465,7 @@ export default function CommandPage() {
                       setWalletSavedToast("Alamat dicopy ke clipboard!");
                       setTimeout(() => setWalletSavedToast(null), 2500);
                     }}
-                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono transition"
+                    className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono transition"
                     title="Copy Address"
                   >
                     📋 Copy
@@ -475,9 +475,9 @@ export default function CommandPage() {
                       setWalletInput(burnerWallet);
                       setIsEditingWallet(true);
                     }}
-                    className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-mono transition"
+                    className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-400 text-[10px] font-mono transition"
                   >
-                    ✏️ Ganti Alamat
+                    ✏️ Ganti
                   </button>
                 </div>
               )}

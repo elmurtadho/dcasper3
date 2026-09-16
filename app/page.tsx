@@ -331,17 +331,17 @@ export default function IntelRadarPage() {
   ).length;
 
   return (
-    <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-3.5 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full overflow-x-hidden">
       {/* Top Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-800/80 gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-5 sm:pb-6 border-b border-slate-800/80 gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+            <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)] shrink-0">
               <Radio className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black font-mono tracking-wider text-white uppercase">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-black font-mono tracking-wider text-white uppercase">
                   Intel Radar
                 </h1>
                 <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-cyan-950 text-cyan-400 border border-cyan-800/60">
@@ -355,33 +355,33 @@ export default function IntelRadarPage() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full lg:w-auto">
           <button
             type="button"
             onClick={handleTriggerRadarScan}
             disabled={isScanningRadar}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-950 to-slate-900 hover:from-cyan-900 hover:to-slate-800 text-cyan-300 border border-cyan-700/80 text-xs font-mono font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.25)] transition-all active:scale-95 disabled:opacity-50"
+            className="flex-1 sm:flex-none px-3 sm:px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-950 to-slate-900 hover:from-cyan-900 hover:to-slate-800 text-cyan-300 border border-cyan-700/80 text-xs font-mono font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.25)] transition-all active:scale-95 disabled:opacity-50"
           >
             <Radio className={`w-3.5 h-3.5 ${isScanningRadar ? "animate-spin text-cyan-400" : "animate-pulse text-cyan-400"}`} />
-            <span>{isScanningRadar ? "Scanning Airdrops..." : "📡 Scan Radar & Discord"}</span>
+            <span className="truncate">{isScanningRadar ? "Scanning..." : "📡 Scan Radar"}</span>
           </button>
 
           <button
             type="button"
             onClick={fetchScoutedProjects}
             disabled={isLoading}
-            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-cyan-400" : ""}`} />
-            Refresh
+            <span className="hidden xs:inline">Refresh</span>
           </button>
 
           <Link
             href="/command"
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 text-xs font-mono font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all active:scale-95"
+            className="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 text-xs font-mono font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(6,182,212,0.3)] transition-all active:scale-95"
           >
             <Zap className="w-3.5 h-3.5 fill-current" />
-            <span>Buka Command Center</span>
+            <span>Command Center</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -502,7 +502,7 @@ export default function IntelRadarPage() {
       </div>
 
       {/* Scouted Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
         {isLoading ? (
           <div className="col-span-full p-12 rounded-2xl border border-slate-800 bg-[#060913] text-center space-y-3 font-mono">
             <Radio className="w-8 h-8 mx-auto text-cyan-400 animate-pulse" />

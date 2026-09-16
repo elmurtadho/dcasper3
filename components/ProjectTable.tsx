@@ -93,17 +93,17 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({
   return (
     <div className="rounded-xl border border-slate-800 bg-[#070b16] overflow-hidden shadow-2xl">
       {/* Table Header Section */}
-      <div className="px-6 py-4 bg-[#0a0f1f] border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
+      <div className="px-4 sm:px-6 py-4 bg-[#0a0f1f] border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-cyan-400" />
+          <h2 className="text-base sm:text-lg font-bold text-white tracking-wide flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-cyan-400 shrink-0" />
             Active Web3 Intelligence Projects
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             Click any row to expand deep intelligence data and execute automated bot tasks.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
           {onRunAll && (
             <button
               type="button"
@@ -119,7 +119,7 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({
               <span>{isRunningAll ? "Running All..." : "Run All"}</span>
             </button>
           )}
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-mono text-slate-400 shrink-0">
             <span className="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
             <span>Profile 862684906</span>
           </div>
@@ -149,14 +149,14 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({
                 {/* Main Interactive Row Header */}
                 <div
                   onClick={() => toggleRow(project.id)}
-                  className="px-6 py-4 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-4 select-none"
+                  className="px-4 sm:px-6 py-4 cursor-pointer flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 select-none"
                 >
                   {/* Left: Expand Icon + Name & Type */}
-                  <div className="flex items-start sm:items-center gap-3 min-w-[280px]">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0 sm:min-w-[260px]">
                     <button
                       type="button"
                       aria-label="Toggle details"
-                      className="p-1 rounded text-slate-400 hover:text-white transition-colors mt-0.5 sm:mt-0"
+                      className="p-1 rounded text-slate-400 hover:text-white transition-colors mt-0.5 sm:mt-0 shrink-0"
                     >
                       {isExpanded ? (
                         <ChevronDown className="w-5 h-5 text-cyan-400" />
@@ -165,16 +165,16 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({
                       )}
                     </button>
 
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-slate-100 group-hover:text-cyan-300 transition-colors text-base tracking-tight">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <span className="font-bold text-slate-100 group-hover:text-cyan-300 transition-colors text-sm sm:text-base tracking-tight truncate">
                           {project.name}
                         </span>
-                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-cyan-400 border border-slate-700/60">
+                        <span className="text-[10px] sm:text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-cyan-400 border border-slate-700/60 shrink-0">
                           {project.type}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 font-mono mt-0.5">
+                      <p className="text-[11px] text-slate-500 font-mono mt-0.5">
                         ID: <span className="text-slate-400">{project.id.slice(0, 13)}...</span>
                       </p>
                     </div>
@@ -196,7 +196,7 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({
                       onSubmit={(e) => handleExecute(project, e)}
                       className="flex items-center gap-2"
                     >
-                      <div className="relative flex-1">
+                      <div className="relative flex-1 min-w-0">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <Terminal className="w-3.5 h-3.5 text-slate-500" />
                         </div>
@@ -204,15 +204,15 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({
                           type="text"
                           value={currentInputValue}
                           onChange={(e) => handleInputChange(project.id, e.target.value)}
-                          placeholder="Enter execution params... e.g. --task=daily_claim"
-                          className="w-full pl-9 pr-3 py-2 bg-[#050811] border border-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-lg text-xs font-mono text-slate-200 placeholder-slate-500 transition-all outline-none"
+                          placeholder="Command... e.g. --task=daily_claim"
+                          className="w-full pl-8 sm:pl-9 pr-2 sm:pr-3 py-2 bg-[#050811] border border-slate-700 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 rounded-lg text-xs font-mono text-slate-200 placeholder-slate-500 transition-all outline-none"
                         />
                       </div>
 
                       <button
                         type="submit"
                         disabled={isExecuting || project.status === "pending_execution"}
-                        className={`px-4 py-2 rounded-lg text-xs font-mono font-semibold flex items-center gap-1.5 transition-all shadow-md ${
+                        className={`px-3 sm:px-4 py-2 rounded-lg text-xs font-mono font-semibold shrink-0 flex items-center gap-1.5 transition-all shadow-md ${
                           project.status === "pending_execution"
                             ? "bg-amber-950/60 text-amber-400 border border-amber-800/80 cursor-not-allowed opacity-80"
                             : isExecuting
@@ -223,17 +223,17 @@ export const ProjectTable: React.FC<ProjectTableProps> = ({
                         {isExecuting ? (
                           <>
                             <Activity className="w-3.5 h-3.5 animate-spin" />
-                            Sending...
+                            <span className="hidden xs:inline">Sending...</span>
                           </>
                         ) : project.status === "pending_execution" ? (
                           <>
                             <Clock className="w-3.5 h-3.5 animate-pulse" />
-                            Queued
+                            <span className="hidden xs:inline">Queued</span>
                           </>
                         ) : (
                           <>
                             <Play className="w-3.5 h-3.5 fill-current" />
-                            Execute
+                            <span>Run</span>
                           </>
                         )}
                       </button>

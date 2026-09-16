@@ -69,25 +69,25 @@ export const IntelModal: React.FC<IntelModalProps> = ({
     (intel.reward_token ? `$${intel.reward_token} Token Rewards` : "High Value Potential");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
       {/* Modal Card */}
       <div
-        className="relative w-full max-w-2xl bg-[#0a1020] border border-slate-700/80 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[90vh] transition-all"
+        className="relative w-full max-w-2xl bg-[#0a1020] border border-slate-700/80 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Accent Gradient */}
         <div className="h-1.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400 shrink-0" />
 
         {/* Modal Header */}
-        <div className="p-6 pb-4 flex items-start justify-between border-b border-slate-800/80 shrink-0">
+        <div className="p-4 sm:p-6 pb-3 sm:pb-4 flex items-start justify-between border-b border-slate-800/80 shrink-0">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-mono text-xs">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              <span className="px-1.5 py-0.5 sm:p-1.5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-mono text-[11px] sm:text-xs">
                 RADAR INTEL
               </span>
-              <span className="text-xs font-mono text-slate-500">ID: {project.id.slice(0, 8)}...</span>
+              <span className="text-[11px] sm:text-xs font-mono text-slate-500">ID: {project.id.slice(0, 8)}...</span>
             </div>
-            <h2 className="text-xl font-bold font-mono text-white mt-1 tracking-tight">
+            <h2 className="text-lg sm:text-xl font-bold font-mono text-white mt-1 tracking-tight">
               {project.name}
             </h2>
             <p className="text-xs text-slate-400 font-mono mt-0.5">{project.type}</p>
@@ -97,14 +97,14 @@ export const IntelModal: React.FC<IntelModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={isProcessing}
-            className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+            className="p-1.5 sm:p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors shrink-0"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-6 space-y-6 overflow-y-auto font-mono text-xs">
+        <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto font-mono text-xs">
           {/* Key Structured Intel 4-Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* 1. Network / Chain */}
@@ -161,17 +161,17 @@ export const IntelModal: React.FC<IntelModalProps> = ({
                 intel.tasks.map((task, idx) => (
                   <div
                     key={idx}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80 text-xs"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-lg bg-slate-950/70 border border-slate-800/80 text-xs"
                   >
                     <div className="space-y-0.5">
                       <span className="font-semibold text-slate-200">{task.name}</span>
-                      <div className="flex items-center gap-2 text-[10px] text-slate-400">
+                      <div className="flex items-center gap-2 text-[10px] text-slate-400 flex-wrap">
                         {task.interval && <span>Interval: {task.interval}</span>}
                         {task.reward && <span className="text-emerald-400">Reward: {task.reward}</span>}
                         {task.cost && <span className="text-amber-400">Biaya: {task.cost}</span>}
                       </div>
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800/50">
+                    <span className="px-2 py-0.5 rounded text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800/50 self-start sm:self-auto">
                       {task.status || "ready"}
                     </span>
                   </div>
@@ -191,10 +191,10 @@ export const IntelModal: React.FC<IntelModalProps> = ({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {Object.entries(intel.metrics).map(([k, v]) => (
                   <div key={k} className="p-2 bg-slate-950/60 rounded border border-slate-800">
-                    <span className="text-[10px] text-slate-500 block uppercase">
+                    <span className="text-[10px] text-slate-500 block uppercase truncate">
                       {k.replace(/_/g, " ")}
                     </span>
-                    <span className="text-xs font-semibold text-slate-200">{String(v)}</span>
+                    <span className="text-xs font-semibold text-slate-200 truncate block">{String(v)}</span>
                   </div>
                 ))}
               </div>
@@ -202,7 +202,7 @@ export const IntelModal: React.FC<IntelModalProps> = ({
           )}
 
           {/* Official DApp URL Link & Raw JSON Toggle */}
-          <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-2 border-t border-slate-800/80">
             {intel.dashboard_url ? (
               <a
                 href={intel.dashboard_url}
@@ -219,7 +219,7 @@ export const IntelModal: React.FC<IntelModalProps> = ({
             <button
               type="button"
               onClick={() => setShowJson(!showJson)}
-              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] flex items-center gap-1.5"
+              className="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[11px] flex items-center gap-1.5 self-start sm:self-auto"
             >
               <Code2 className="w-3.5 h-3.5" />
               {showJson ? "Sembunyikan JSON" : "Lihat Raw JSON"}
@@ -235,12 +235,12 @@ export const IntelModal: React.FC<IntelModalProps> = ({
         </div>
 
         {/* Modal Footer / Action Buttons */}
-        <div className="p-5 bg-[#080d19] border-t border-slate-800/80 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+        <div className="p-3.5 sm:p-5 bg-[#080d19] border-t border-slate-800/80 flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 shrink-0">
           <button
             type="button"
             onClick={() => handleAction("ignored")}
             disabled={isProcessing}
-            className="px-4 py-2.5 rounded-xl text-xs font-mono font-semibold bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-mono font-semibold bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-800/60 flex items-center justify-center gap-2 transition-all active:scale-95 disabled:opacity-50"
           >
             <Trash2 className="w-3.5 h-3.5 text-rose-400" />
             Abaikan / Buang
@@ -250,7 +250,7 @@ export const IntelModal: React.FC<IntelModalProps> = ({
             type="button"
             onClick={() => handleAction("active")}
             disabled={isProcessing}
-            className="px-6 py-2.5 rounded-xl text-xs font-mono font-bold tracking-wide bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all active:scale-95 disabled:opacity-50"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-xs font-mono font-bold tracking-wide bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all active:scale-95 disabled:opacity-50"
           >
             {isProcessing ? (
               <>

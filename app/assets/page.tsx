@@ -168,20 +168,20 @@ export default function AssetsVaultPage() {
   const totalZeroBudget = assets.filter((a) => a.isZeroBudget).length;
 
   return (
-    <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto w-full">
+    <div className="p-3.5 sm:p-6 lg:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto w-full">
       {/* Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-slate-800/80 gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 sm:pb-6 border-b border-slate-800/80 gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]">
-              <Coins className="w-5 h-5 fill-current" />
+            <div className="p-2 sm:p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)] shrink-0">
+              <Coins className="w-4 h-4 sm:w-5 sm:h-5 fill-current" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-black font-mono tracking-wider text-white uppercase">
+                <h1 className="text-lg sm:text-2xl font-black font-mono tracking-wider text-white uppercase">
                   Vault Koin, Faucet & Swaps
                 </h1>
-                <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-950 text-amber-400 border border-amber-800/60">
+                <span className="px-1.5 sm:px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-mono font-bold bg-amber-950 text-amber-400 border border-amber-800/60">
                   ASSET RADAR
                 </span>
               </div>
@@ -193,12 +193,12 @@ export default function AssetsVaultPage() {
         </div>
 
         {/* Action Controls */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleTriggerUrgentAlert}
             disabled={isSendingUrgent}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-mono font-black text-xs flex items-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.4)] active:scale-95 transition-all disabled:opacity-50"
+            className="flex-1 sm:flex-initial px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-mono font-black text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(239,68,68,0.4)] active:scale-95 transition-all disabled:opacity-50"
           >
             {isSendingUrgent ? (
               <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -212,7 +212,7 @@ export default function AssetsVaultPage() {
             type="button"
             onClick={fetchData}
             disabled={isLoading}
-            className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
+            className="px-3 sm:px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-mono flex items-center gap-2 transition-all active:scale-95 disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin text-cyan-400" : ""}`} />
             <span>Refresh</span>
@@ -229,18 +229,18 @@ export default function AssetsVaultPage() {
       )}
 
       {/* MetaMask Burner Target Bar */}
-      <div className="bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900 border border-amber-500/30 p-3.5 rounded-xl shadow-md flex items-center justify-between flex-wrap gap-3">
-        <div className="flex items-center gap-3">
+      <div className="bg-gradient-to-r from-amber-950/30 via-slate-900 to-slate-900 border border-amber-500/30 p-3.5 rounded-xl shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+        <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center text-white text-base shrink-0">
             🦊
           </div>
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-bold text-white font-mono uppercase">Target MetaMask Burner</span>
               <span className="text-[10px] text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded font-mono">Penerima Faucet & Koin</span>
             </div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="font-mono text-xs text-amber-300 font-semibold">{burnerWallet}</span>
+            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span className="font-mono text-[11px] sm:text-xs text-amber-300 font-semibold break-all sm:break-normal">{burnerWallet}</span>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(burnerWallet);
@@ -253,10 +253,10 @@ export default function AssetsVaultPage() {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full md:w-auto">
           <Link
             href="/command"
-            className="text-xs text-cyan-400 hover:text-cyan-300 font-mono flex items-center gap-1 border border-cyan-800/60 bg-cyan-950/30 px-3 py-1.5 rounded-lg transition"
+            className="w-full md:w-auto text-xs text-cyan-400 hover:text-cyan-300 font-mono flex items-center justify-center gap-1 border border-cyan-800/60 bg-cyan-950/30 px-3 py-1.5 rounded-lg transition"
           >
             <span>⚡ Eksekusi Klaim di Command Center</span>
             <span>➔</span>
@@ -265,51 +265,51 @@ export default function AssetsVaultPage() {
       </div>
 
       {/* HUD Overview Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl bg-[#0a0f1d] border border-slate-800 shadow-lg">
-          <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4">
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a0f1d] border border-slate-800 shadow-lg">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-slate-400">
             <span>Koin Terpantau</span>
-            <Coins className="w-4 h-4 text-amber-400" />
+            <Coins className="w-4 h-4 text-amber-400 shrink-0" />
           </div>
-          <p className="text-2xl font-black font-mono text-white mt-1.5">{assets.length} Koin</p>
-          <span className="text-[11px] font-mono text-slate-500">Multi-Chain Ecosystem</span>
+          <p className="text-xl sm:text-2xl font-black font-mono text-white mt-1 sm:mt-1.5">{assets.length} Koin</p>
+          <span className="text-[10px] sm:text-[11px] font-mono text-slate-500 truncate block">Multi-Chain Ecosystem</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#0a0f1d] border border-cyan-900/40 shadow-lg">
-          <div className="flex items-center justify-between text-xs font-mono text-cyan-400">
-            <span>Faucet Siap Klaim</span>
-            <Droplet className="w-4 h-4 text-cyan-400 animate-bounce" />
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a0f1d] border border-cyan-900/40 shadow-lg">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-cyan-400">
+            <span>Faucet Siap</span>
+            <Droplet className="w-4 h-4 text-cyan-400 animate-bounce shrink-0" />
           </div>
-          <p className="text-2xl font-black font-mono text-cyan-300 mt-1.5">{totalFaucetsReady} Siap</p>
-          <span className="text-[11px] font-mono text-cyan-500/80">Reset Harian / Interval</span>
+          <p className="text-xl sm:text-2xl font-black font-mono text-cyan-300 mt-1 sm:mt-1.5">{totalFaucetsReady} Siap</p>
+          <span className="text-[10px] sm:text-[11px] font-mono text-cyan-500/80 truncate block">Reset Harian / Interval</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#0a0f1d] border border-emerald-900/40 shadow-lg">
-          <div className="flex items-center justify-between text-xs font-mono text-emerald-400">
-            <span>DEX Swap & Withdraw</span>
-            <ArrowRightLeft className="w-4 h-4 text-emerald-400" />
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a0f1d] border border-emerald-900/40 shadow-lg">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-emerald-400">
+            <span>DEX Swap</span>
+            <ArrowRightLeft className="w-4 h-4 text-emerald-400 shrink-0" />
           </div>
-          <p className="text-2xl font-black font-mono text-emerald-300 mt-1.5">{totalSwapsReady} Siap</p>
-          <span className="text-[11px] font-mono text-emerald-500/80">Tukar ke Token Reward</span>
+          <p className="text-xl sm:text-2xl font-black font-mono text-emerald-300 mt-1 sm:mt-1.5">{totalSwapsReady} Siap</p>
+          <span className="text-[10px] sm:text-[11px] font-mono text-emerald-500/80 truncate block">Tukar ke Reward</span>
         </div>
 
-        <div className="p-4 rounded-xl bg-[#0a0f1d] border border-purple-900/40 shadow-lg">
-          <div className="flex items-center justify-between text-xs font-mono text-purple-400">
-            <span>Zero Budget (Gratis)</span>
-            <Sparkles className="w-4 h-4 text-purple-400" />
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a0f1d] border border-purple-900/40 shadow-lg">
+          <div className="flex items-center justify-between text-[11px] sm:text-xs font-mono text-purple-400">
+            <span>Zero Budget</span>
+            <Sparkles className="w-4 h-4 text-purple-400 shrink-0" />
           </div>
-          <p className="text-2xl font-black font-mono text-purple-300 mt-1.5">{totalZeroBudget} Proyek</p>
-          <span className="text-[11px] font-mono text-purple-500/80">Modal 0 USD (Testnet)</span>
+          <p className="text-xl sm:text-2xl font-black font-mono text-purple-300 mt-1 sm:mt-1.5">{totalZeroBudget} Proyek</p>
+          <span className="text-[10px] sm:text-[11px] font-mono text-purple-500/80 truncate block">Modal 0 USD (Free)</span>
         </div>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-2 bg-[#0a0f1d] border border-slate-800 rounded-xl">
-        <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3 p-2 bg-[#0a0f1d] border border-slate-800 rounded-xl">
+        <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 no-scrollbar">
           <button
             type="button"
             onClick={() => setFilterType("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium whitespace-nowrap transition-all ${
               filterType === "all"
                 ? "bg-slate-800 text-white shadow-sm"
                 : "text-slate-400 hover:text-slate-200"
@@ -320,7 +320,7 @@ export default function AssetsVaultPage() {
           <button
             type="button"
             onClick={() => setFilterType("faucet")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 whitespace-nowrap transition-all ${
               filterType === "faucet"
                 ? "bg-cyan-950 text-cyan-300 border border-cyan-800"
                 : "text-slate-400 hover:text-cyan-300"
@@ -332,7 +332,7 @@ export default function AssetsVaultPage() {
           <button
             type="button"
             onClick={() => setFilterType("swap")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 whitespace-nowrap transition-all ${
               filterType === "swap"
                 ? "bg-emerald-950 text-emerald-300 border border-emerald-800"
                 : "text-slate-400 hover:text-emerald-300"
@@ -344,7 +344,7 @@ export default function AssetsVaultPage() {
           <button
             type="button"
             onClick={() => setFilterType("free")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-mono font-medium flex items-center gap-1.5 whitespace-nowrap transition-all ${
               filterType === "free"
                 ? "bg-purple-950 text-purple-300 border border-purple-800"
                 : "text-slate-400 hover:text-purple-300"
@@ -365,7 +365,7 @@ export default function AssetsVaultPage() {
       </div>
 
       {/* Asset Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {filteredAssets.length === 0 ? (
           <div className="col-span-full p-12 text-center text-slate-500 font-mono text-sm bg-[#0a0f1d] border border-slate-800 rounded-2xl">
             Tidak ada koin atau faucet yang sesuai dengan filter pencarian ini.

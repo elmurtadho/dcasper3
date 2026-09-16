@@ -60,13 +60,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b14] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-[#070b14] flex flex-col justify-center items-center px-3 sm:px-4 py-8 sm:py-12 relative overflow-hidden selection:bg-cyan-500 selection:text-black">
       {/* Background Decorative Cyber Grid / Glow */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main Login Card */}
-      <div className="relative w-full max-w-md bg-[#0c1222]/90 border border-slate-800 backdrop-blur-xl rounded-2xl shadow-2xl p-8 space-y-6 z-10 transition-all duration-300 hover:border-cyan-500/40">
+      <div className="relative w-full max-w-md bg-[#0c1222]/90 border border-slate-800 backdrop-blur-xl rounded-2xl shadow-2xl p-5 sm:p-8 space-y-5 sm:space-y-6 z-10 transition-all duration-300 hover:border-cyan-500/40">
         {/* Top Glow Accent Bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400 rounded-t-2xl" />
 
