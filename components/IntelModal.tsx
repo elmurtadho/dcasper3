@@ -69,42 +69,45 @@ export const IntelModal: React.FC<IntelModalProps> = ({
     (intel.reward_token ? `$${intel.reward_token} Token Rewards` : "High Value Potential");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      {/* Modal Card */}
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+      {/* Modal Card / Bottom Sheet on Mobile */}
       <div
-        className="relative w-full max-w-2xl bg-[#0a1020] border border-slate-700/80 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] transition-all"
+        className="relative w-full max-w-2xl bg-[#0a1020] border-t sm:border border-slate-700/80 rounded-t-3xl sm:rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col max-h-[88vh] sm:max-h-[90vh] transition-all"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Mobile Drag Indicator */}
+        <div className="w-12 h-1.5 bg-slate-700/80 rounded-full mx-auto my-2.5 sm:hidden shrink-0" />
+
         {/* Top Accent Gradient */}
-        <div className="h-1.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400 shrink-0" />
+        <div className="h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400 shrink-0" />
 
         {/* Modal Header */}
-        <div className="p-4 sm:p-6 pb-3 sm:pb-4 flex items-start justify-between border-b border-slate-800/80 shrink-0">
+        <div className="px-4 py-3 sm:p-6 sm:pb-4 flex items-start justify-between border-b border-slate-800/80 shrink-0">
           <div>
             <div className="flex items-center gap-2 sm:gap-2.5">
-              <span className="px-1.5 py-0.5 sm:p-1.5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-mono text-[11px] sm:text-xs">
+              <span className="px-2 py-0.5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800/60 font-mono text-[10px] sm:text-xs font-bold">
                 RADAR INTEL
               </span>
-              <span className="text-[11px] sm:text-xs font-mono text-slate-500">ID: {project.id.slice(0, 8)}...</span>
+              <span className="text-[10px] sm:text-xs font-mono text-slate-500">ID: {project.id.slice(0, 8)}...</span>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold font-mono text-white mt-1 tracking-tight">
+            <h2 className="text-base sm:text-xl font-bold font-mono text-white mt-1 tracking-tight">
               {project.name}
             </h2>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">{project.type}</p>
+            <p className="text-[11px] sm:text-xs text-slate-400 font-mono mt-0.5">{project.type}</p>
           </div>
 
           <button
             type="button"
             onClick={onClose}
             disabled={isProcessing}
-            className="p-1.5 sm:p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors shrink-0"
+            className="p-2 rounded-xl bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors shrink-0"
           >
-            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-3.5 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto font-mono text-xs">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto font-mono text-xs">
           {/* Key Structured Intel 4-Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {/* 1. Network / Chain */}
